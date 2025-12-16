@@ -1,0 +1,118 @@
+
+
+a {
+  font-weight: 500;
+  color: #000000;
+  text-decoration: inherit;
+}
+a:hover {
+  color:#995b72 ;
+}
+
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+.button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color:rgb(172, 144, 163);
+  cursor: pointer;
+  transition: #995b72 0.25s;
+}
+
+.button:active {
+    background-color: #995b72; /* darker shade when clicked */
+    transform: scale(0.97); 
+
+}
+
+.navbar{
+  height: 10vh;
+  
+}
+
+.signin-button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color:rgb(172, 144, 163);
+  cursor: pointer;
+  transition: #995b72 0.25s;
+  margin-left: 8rem;
+}
+
+.signin-button:active {
+    background-color: #995b72; 
+    color: white;
+    transform: scale(0.97); 
+
+}
+
+.signin-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #3d3c3c;
+}
+
+.login-button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color:rgb(172, 144, 163);
+  cursor: pointer;
+  transition: #995b72 0.25s;
+  margin-left: 3rem;
+}
+
+.login-button:active {
+    background-color: #995b72; 
+    color: white;
+    transform: scale(0.97); 
+
+}
+
+.login-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #3d3c3c;
+}
+.inputs{
+  background-color:rgb(172, 144, 163) ;
+  color: white;
+}
+
+
+input::placeholder {
+  color: #ffffff; 
+  opacity: 1;     
+  font-style: italic; 
+}
+
+.notfound-img{
+  border-radius: 3rem;
+}
+
+.anchor-collapse{
+display: block;
+width: 50vw;
+height: auto;
+}
+
+.anchor-collapse:hover{
+background-color: rgb(172, 144, 163);
+transform: scale(1.05);
+}
+
+
+
