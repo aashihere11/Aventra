@@ -160,14 +160,14 @@ code {
 }
 
 .order-table tr {
-  border-top: 1px solid #f1f1f1;
-  border-bottom: 1px solid #f1f1f1;
+  border-top: 1px solid  #001f4d;;
+  border-bottom: 1px solid  #001f4d;;
 }
 
 .order-table th {
   text-align: right;
   padding: 15px 10px;
-  color: rgb(145, 145, 145);
+  color: #001f4d;
   font-weight: 300;
   font-size: 0.8rem;
 }
@@ -208,7 +208,7 @@ code {
 }
 
 .order-table td.loss {
-  color: rgb(250, 118, 78);
+  color: rgb(255, 0, 0);
 }
 
 .row {
@@ -441,7 +441,7 @@ display: flex;
 }
 
 .order-table td.loss {
-  color: rgb(250, 118, 78);
+  color: rgb(255, 0, 0);
 }
 
 .row {
@@ -742,19 +742,30 @@ display: flex;
 }
 
 .buy {
-  background-color: #a4daf0;;
+  background-color: #001f4d;
   color: #fff;
   font-weight: 400;
   font-size: 0.8rem;
   border: 0.7px solid #a4daf0;;
 }
 
+.buy:active {
+  background-color: #a4daf0;
+  color: #000000;
+}
+
+
 .sell {
-  background-color:  #a4daf0;
+  background-color:   #001f4d;
   color: #fff;
   font-weight: 400;
   font-size: 0.8rem;
-  border: 0.7px solid #a4daf0;;
+  border: 0.7px solid   #a4daf0;;
+}
+
+.sell:active {
+  background-color: #a4daf0;
+  color: #000000;
 }
 
 .action {
