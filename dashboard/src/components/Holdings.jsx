@@ -1,6 +1,22 @@
 import React from "react";
 import { holdings } from "../data/data";
+import { LineChart } from "./LineChart";
 const Holdings = () => {
+
+    const labels = holdings.map((stock) =>stock.name);
+    
+    const data = {
+      labels,
+      datasets: [
+        {
+          label: "holdings value",
+          data: holdings.map((stock) => stock.price),
+          borderColor: '#001f4d',
+          backgroundColor: '#a4daf0',
+        },
+        
+      ],
+    };
     return (
         <>
             <h3 className="title">Holdings (13)</h3>
@@ -59,7 +75,9 @@ const Holdings = () => {
                     <h5>1,553.40 (+5.20%)</h5>
                     <p>P&L</p>
                 </div>
+
             </div>
+            <LineChart data={data}/>
         </>
     );
 };
