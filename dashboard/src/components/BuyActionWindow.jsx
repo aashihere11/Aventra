@@ -1,14 +1,32 @@
-import React, { useState } from "react";
+import React, { useState , useContext} from "react";
 import { Link } from "react-router-dom";
 import GeneralContext from "./GeneralContext";
+import axios from "axios";
 import "../BuyActionWindow.css";
 
 const BuyActionWindow = ({ uid }) => {
 
+     const generalContext = useContext(GeneralContext); 
+    const [stockQuantity, setStockQuantity] = useState(1);
+    const [stockPrice, setStockPrice] = useState(0.0);
+    
 
-
+      const handleBuyClick = async() => {
+        try{
+    await axios.post("http://localhost:3000/newOrder", {
+      name: uid,
+      qty: stockQuantity,
+      price: stockPrice,
+      mode: "BUY",
+    });
+    generalContext.closeBuyWindow();}
+    catch(err){
+        console.log(err);
+    }
+      }; 
+      
     const handleCancelClick = () => {
-        GeneralContext.closeBuyWindow();
+        generalContext.closeBuyWindow();
     };
 
     return (
@@ -21,7 +39,8 @@ const BuyActionWindow = ({ uid }) => {
                             type="number"
                             name="qty"
                             id="qty"
-
+                            onChange={(e) => setStockQuantity(Number(e.target.value))}
+                            value={stockQuantity}
                         />
                     </fieldset>
                     <fieldset>
@@ -31,7 +50,8 @@ const BuyActionWindow = ({ uid }) => {
                             name="price"
                             id="price"
                             step="0.05"
-
+                            onChange={(e) => setStockPrice(Number(e.target.value))}
+                            value={stockPrice}
                         />
                     </fieldset>
                 </div>
@@ -40,7 +60,7 @@ const BuyActionWindow = ({ uid }) => {
             <div className="buttons">
                 <span>Margin required ₹140.65</span>
                 <div>
-                    <Link className="buy-btn btns" >
+                    <Link className="buy-btn btns"  onClick={handleBuyClick} >
                         Buy
                     </Link>
                     <Link to="" className="cancel-btn btns" onClick={handleCancelClick}>

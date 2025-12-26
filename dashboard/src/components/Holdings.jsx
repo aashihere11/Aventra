@@ -1,25 +1,36 @@
-import React from "react";
-import { holdings } from "../data/data";
+import React, { useState, useEffect } from "react";
 import { LineChart } from "./LineChart";
+import axios from "axios";
 const Holdings = () => {
+    const [holdings, setHoldings] = useState([]);
 
-    const labels = holdings.map((stock) =>stock.name);
-    
+    useEffect(() => {
+        axios.get("http://localhost:3000/allHoldings")
+            .then((response) => {
+                setHoldings(response.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching holdings:", error);
+            });
+    }, []);
+
+    const labels = holdings.map((stock) => stock.name);
+
     const data = {
-      labels,
-      datasets: [
-        {
-          label: "holdings value",
-          data: holdings.map((stock) => stock.price),
-          borderColor: '#001f4d',
-          backgroundColor: '#a4daf0',
-        },
-        
-      ],
+        labels,
+        datasets: [
+            {
+                label: "holdings value",
+                data: holdings.map((stock) => stock.price),
+                borderColor: '#001f4d',
+                backgroundColor: '#a4daf0',
+            },
+
+        ],
     };
     return (
         <>
-            <h3 className="title">Holdings (13)</h3>
+            <h3 className="title">{holdings.length} holdings</h3>
 
             <div className="order-table">
                 <table>
@@ -77,7 +88,7 @@ const Holdings = () => {
                 </div>
 
             </div>
-            <LineChart data={data}/>
+            <LineChart data={data} />
         </>
     );
 };

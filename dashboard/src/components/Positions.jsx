@@ -1,6 +1,16 @@
-import React from "react";
-import { positions } from "../data/data";
+import React, { useState, useEffect } from "react";
+import  axios  from "axios";
 const Positions = () => {
+    const [positions, setPositions] = useState([]);
+    useEffect(() => {
+        axios.get("http://localhost:3000/allPositions")
+            .then((response) => {
+                setPositions(response.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching positions:", error);
+            });
+    }, []);
     return (
         <>
             <h3 className="title">Positions (2)</h3>
