@@ -1,30 +1,31 @@
-import React, { useState , useContext} from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import GeneralContext from "./GeneralContext";
 import axios from "axios";
 import "../BuyActionWindow.css";
 
-const BuyActionWindow = ({ uid }) => {
+const BuyActionWindow = ({ uid, price }) => {
 
-     const generalContext = useContext(GeneralContext); 
+    const generalContext = useContext(GeneralContext);
     const [stockQuantity, setStockQuantity] = useState(1);
-    const [stockPrice, setStockPrice] = useState(0.0);
-    
+    const totalprice = stockQuantity * price.toFixed(2);
 
-      const handleBuyClick = async() => {
-        try{
-    await axios.post("http://localhost:3000/newOrder", {
-      name: uid,
-      qty: stockQuantity,
-      price: stockPrice,
-      mode: "BUY",
-    });
-    generalContext.closeBuyWindow();}
-    catch(err){
-        console.log(err);
-    }
-      }; 
-      
+
+    const handleBuyClick = async () => {
+        try {
+            await axios.post("http://localhost:3000/newOrder", {
+                name: uid,
+                qty: stockQuantity,
+                price: totalprice,
+                mode: "BUY",
+            });
+            generalContext.closeBuyWindow();
+        }
+        catch (err) {
+            console.log(err);
+        }
+    };
+
     const handleCancelClick = () => {
         generalContext.closeBuyWindow();
     };
@@ -49,9 +50,7 @@ const BuyActionWindow = ({ uid }) => {
                             type="number"
                             name="price"
                             id="price"
-                            step="0.05"
-                            onChange={(e) => setStockPrice(Number(e.target.value))}
-                            value={stockPrice}
+                            value={parseFloat(price)}
                         />
                     </fieldset>
                 </div>
@@ -60,7 +59,7 @@ const BuyActionWindow = ({ uid }) => {
             <div className="buttons">
                 <span>Margin required ₹140.65</span>
                 <div>
-                    <Link className="buy-btn btns"  onClick={handleBuyClick} >
+                    <Link className="buy-btn btns" onClick={handleBuyClick} >
                         Buy
                     </Link>
                     <Link to="" className="cancel-btn btns" onClick={handleCancelClick}>

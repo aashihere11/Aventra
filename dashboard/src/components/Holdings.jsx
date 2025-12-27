@@ -40,16 +40,15 @@ const Holdings = () => {
                         <th>Avg. cost</th>
                         <th>LTP</th>
                         <th>Cur. val</th>
-                        <th>P&L</th>
+                        <th>PL</th>
                         <th>Net chg.</th>
                         <th>Day chg.</th>
                     </tr>
-
+                     
                     {holdings.map((stock, index) => {
-                        const curValue = stock.price * stock.qty;
+                        const curValue = stock.price * stock.qty; 
                         const isProfit = curValue - stock.avg * stock.qty >= 0.0;
                         const profClass = isProfit ? "profit" : "loss";
-                        const dayClass = stock.isLoss ? "loss" : "profit";
 
                         return (
                             <tr key={index}>
@@ -61,8 +60,8 @@ const Holdings = () => {
                                 <td className={profClass}>
                                     {(curValue - stock.avg * stock.qty).toFixed(2)}
                                 </td>
-                                <td className={profClass}>{stock.net}</td>
-                                <td className={dayClass}>{stock.day}</td>
+                                <td className={profClass}>{stock.net > 0 ? "+": "-"}{stock.net.toFixed(2)}</td>
+                                <td className={profClass}>{stock.day > 0 ? "+": "-"}{stock.day.toFixed(2)}</td>
                             </tr>
                         );
                     })}
@@ -71,6 +70,7 @@ const Holdings = () => {
 
             <div className="row">
                 <div className="col">
+                    
                     <h5>
                         29,875.<span>55</span>{" "}
                     </h5>
