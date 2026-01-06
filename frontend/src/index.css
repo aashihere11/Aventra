@@ -114,5 +114,12 @@ background-color: rgb(172, 144, 163);
 transform: scale(1.05);
 }
 
+.nav-item{
+  font-size: small;
+}
+
+.nav-item:hover{
+  font-weight: 800;
+}
 
 

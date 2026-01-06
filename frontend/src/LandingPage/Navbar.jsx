@@ -1,5 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import LoginIcon from '@mui/icons-material/Login';
+import PersonAddAltRoundedIcon from '@mui/icons-material/PersonAddAltRounded';
+import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
+import AttachMoneySharpIcon from '@mui/icons-material/AttachMoneySharp';
+import CrueltyFreeSharpIcon from '@mui/icons-material/CrueltyFreeSharp';
 
 function Navbar() {
     return (
@@ -32,12 +37,12 @@ function Navbar() {
                         <ul class="navbar-nav mb-lg-0">
                             <li class="nav-item">
                                 <Link to="/login" class="nav-link active" >
-                                    login
+                                    login <LoginIcon/>
                                 </Link >
                             </li>
                             <li class="nav-item">
                                 <Link to="/signup" class="nav-link active" aria-current="page" >
-                                    Signup
+                                    Signup <PersonAddAltRoundedIcon/>
                                 </Link >
                             </li>
                             <li class="nav-item">
@@ -47,17 +52,17 @@ function Navbar() {
                             </li>
                             <li class="nav-item">
                                 <Link to="/product" class="nav-link active" >
-                                    Product
+                                    Product <CrueltyFreeSharpIcon/>
                                 </Link >
                             </li>
                             <li class="nav-item">
                                 <Link to="/pricing" class="nav-link active" >
-                                    Pricing
+                                    Pricing <AttachMoneySharpIcon/>
                                 </Link >
                             </li>
                             <li class="nav-item">
                                 <Link to="/support" class="nav-link active" >
-                                    Support
+                                    Support <HelpOutlineRoundedIcon/>
                                 </Link >
                             </li>
                         </ul>

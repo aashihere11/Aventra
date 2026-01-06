@@ -27,6 +27,7 @@ function Login() {
                                 },
                             }}
                             className='inputs'
+                            required
                         />
                         <TextField
                             id="outlined-basic"
@@ -41,7 +42,8 @@ function Login() {
                                     color: 'rgb(172, 144, 163)',
                                 },
                             }}
-                            className='inputs mt-2' />
+                            className='inputs mt-2'
+                            required />
                         <button type="submit" className="login-button mt-3 ">login</button>
 
                         <div className="login-link m-3 px-5">
