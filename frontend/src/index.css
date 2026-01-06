@@ -88,13 +88,13 @@ h1 {
     box-shadow: 0 6px 0 #3d3c3c;
 }
 .inputs{
-  background-color:rgb(172, 144, 163) ;
-  color: white;
+  background-color:rgb(255, 255, 255) ;
+  color: rgb(172, 144, 163);
 }
 
 
 input::placeholder {
-  color: #ffffff; 
+  color: #000000; 
   opacity: 1;     
   font-style: italic; 
 }
