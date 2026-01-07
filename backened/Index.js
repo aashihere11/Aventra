@@ -4,16 +4,31 @@ require("dotenv").config();
 const { HoldingsModel } = require("./Models/HoldingsModel");
 const { PositionsModel } = require("./Models/PositionsModel");
 const { OrdersModel } = require("./Models/OrdersModel");
+const{UserModel} = require("./Models/UsersModel")
 const cors = require('cors');
 const finnhub = require('finnhub');
+const LocalStrategy = require('passport-local');
+const session = require('express-session');
+const passport = require('passport'); 
 const app = express();
 
 const PORT = process.env.PORT || 3000;
 const mongoURL = process.env.MONGO_URL;
-app.use(cors());
+
+app.use(cors({
+  origin: 'http://localhost:3000', 
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(session({ secret: 'secret', resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(UserModel.createStrategy());
+passport.serializeUser(UserModel.serializeUser());
+passport.deserializeUser(UserModel.deserializeUser());
 const finnhubClient = new finnhub.DefaultApi(process.env.FINNHUB_API_KEY)
 
 app.post("/stocks", async (req, res) => {
