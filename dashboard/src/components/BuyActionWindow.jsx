@@ -4,7 +4,7 @@ import GeneralContext from "./GeneralContext";
 import axios from "axios";
 import "../BuyActionWindow.css";
 
-const BuyActionWindow = ({ uid, price }) => {
+const BuyActionWindow = ({ uid, price, pc }) => {
 
     const generalContext = useContext(GeneralContext);
     const [stockQuantity, setStockQuantity] = useState(1);
@@ -17,6 +17,7 @@ const BuyActionWindow = ({ uid, price }) => {
                 name: uid,
                 qty: stockQuantity,
                 price: totalprice,
+                pc: pc,
                 mode: "BUY",
             });
             generalContext.closeBuyWindow();

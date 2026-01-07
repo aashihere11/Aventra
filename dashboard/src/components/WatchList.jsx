@@ -1,5 +1,4 @@
-import React, { useState, useContext } from "react";
-import { watchlist } from "../data/data";
+import React, { useState, useContext , useEffect} from "react";
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -8,10 +7,23 @@ import Tooltip from '@mui/material/Tooltip';
 import Fade from '@mui/material/Fade';
 import GeneralContext from "./GeneralContext";
 import { DoughnutChart } from "./DoughnutChart";
+import axios from "axios";
 
 const WatchList = () => {
+    const [watchlist, setWatchlist] = useState([]);
+     const symbols = ["INFY", "TCS", "ORCL", "TSLA", "AMZN", "ADBE", "NVDA", "AAPL", "GOOGL", "MSFT"];
+  
+    useEffect(() =>{
+       axios.post("http://localhost:3000/stocks", {symbols})
+       .then((response)=>{
+        setWatchlist(response.data);
+       })
+       .catch((error)=>{
+        console.log("Error fetching stock data", error);
+       })
+    }, []);
     const data = {
-        labels: watchlist.map((stock) => stock.name),
+        labels: watchlist.map((stock) => stock.symbol),
         datasets: [
             {
                 label: "stock price",
@@ -74,29 +86,30 @@ const WatchListItem = ({ stock }) => {
     return (
         <li onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
             <div className="item">
-                <p className={stock.isDown ? "down" : "up"}>{stock.name}</p>
+                <p className={stock.price < stock.previousClose ? "down" : "up"}>{stock.symbol}</p>
                 <div className="itemInfo">
-                    <span className="percent">{stock.percent}</span>
-                    {stock.isDown ? (
+                    <span className="percent">{stock.percentChange}</span>
+                    {stock.price < stock.previousClose ? (
                         <KeyboardArrowDownIcon className="down" />
                     ) : (
                         <KeyboardArrowUpIcon className="up" />
                     )}
                     <span className="price">{stock.price}</span>
+                    <span> {stock.lastUpdated}</span>
                 </div>
             </div>
-            {showWatchlistActions && <WatchListActions uid={stock.name} price={stock.price} />}
+            {showWatchlistActions && <WatchListActions uid={stock.symbol} price={stock.price} pc={stock.previousClose} />}
         </li>
     );
 };
 
 
-const WatchListActions = ({ uid, price }) => {
+const WatchListActions = ({ uid, price, pc }) => {
 
     const generalContext = useContext(GeneralContext);
 
     const handleBuyClick = () => {
-        generalContext.openBuyWindow(uid, price);
+        generalContext.openBuyWindow(uid, price, pc);
     }
     return (
         <span className="actions">
