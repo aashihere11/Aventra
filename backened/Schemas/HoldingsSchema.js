@@ -1,7 +1,7 @@
 const { Schema } = require("mongoose");
 
 const HoldingsSchema = new Schema({
-    name: String,
+    name: {type: String, index:true},
     qty: Number,
     avg: Number,
     price: Number,

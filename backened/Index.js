@@ -1,3 +1,5 @@
+const dns = require('dns');
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 const express = require("express");
 const mongoose = require("mongoose");
 require("dotenv").config();
@@ -12,9 +14,9 @@ const session = require('express-session');
 const passport = require('passport');
 const app = express();
 
+
 const PORT = process.env.PORT || 3000;
 const mongoURL = process.env.MONGO_URL;
-
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:3000'],
   credentials: true
@@ -68,8 +70,9 @@ app.post("/stocks", async (req, res) => {
 // get all holdings
 app.get("/allHoldings", async (req, res) => {
   try {
-    let allHoldings = await HoldingsModel.find({});
+    let allHoldings = await HoldingsModel.find({}).lean();
     res.json(allHoldings);
+    console.log(allHoldings);
   }
   catch (err) {
     console.log(err);
@@ -79,14 +82,14 @@ app.get("/allHoldings", async (req, res) => {
 
 //get all positions
 app.get("/allPositions", async (req, res) => {
-  let allPositions = await PositionsModel.find({});
+  let allPositions = await PositionsModel.find({}).lean();
   res.json(allPositions);
 });
 
 
 // get all orders
 app.get("/allOrders", async (req, res) => {
-  let allOrders = await OrdersModel.find({});
+  let allOrders = await OrdersModel.find({}).lean();
   res.json(allOrders);
 });
 
@@ -102,7 +105,7 @@ app.post("/newOrder", async (req, res) => {
       mode: mode,
     });
 
-    newOrder.save();
+    await newOrder.save();
 
 
 
@@ -144,22 +147,22 @@ app.post("/newOrder", async (req, res) => {
 app.post("/register", async (req, res) => {
   const { username, password, email } = req.body;
 
-    if (!username || !password || !email) {
-      return res.status(400).json({ message: "All fields are required." });
-     }
-    try {
-      const newUser = new UsersModel({ username, email });
-      const user = await UsersModel.register(newUser, password);
+  if (!username || !password || !email) {
+    return res.status(400).json({ message: "All fields are required." });
+  }
+  try {
+    const newUser = new UsersModel({ username, email });
+    const user = await UsersModel.register(newUser, password);
 
-       req.login(user, function (err) {
-        if (err) { return next(err); }
-        return res.status(200).json({ success: true });
-       });
-       }
-    catch (err) {
-     res.status(400).json({ message: err.message });
-     }
-     });
+    req.login(user, function (err) {
+      if (err) { return next(err); }
+      return res.status(200).json({ success: true });
+    });
+  }
+  catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
 
 
 app.get("/", (req, res) => {
@@ -167,7 +170,8 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`server running on port ${PORT}`);
-  mongoose.connect(mongoURL);
-  console.log("connected to mongoDB");
+  console.log(`server running on port ${PORT}.......`);
+  mongoose.connect(mongoURL)
+    .then(() => console.log("✅ Successfully connected to MongoDB"))
+    .catch((err) => console.error("❌ MongoDB connection error:", err));
 }); 
