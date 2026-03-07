@@ -73,7 +73,7 @@ h1 {
   background-color:rgb(172, 144, 163);
   cursor: pointer;
   transition: #995b72 0.25s;
-  margin-left: 3rem;
+  margin-left: 2.5rem;
 }
 
 .login-button:active {
@@ -90,6 +90,7 @@ h1 {
 .inputs{
   background-color:rgb(255, 255, 255) ;
   color: rgb(172, 144, 163);
+  width: 20vw;
 }
 
 

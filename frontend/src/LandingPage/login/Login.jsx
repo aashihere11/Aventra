@@ -1,19 +1,57 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from "react-router-dom";
+import axios from "axios";
 import TextField from '@mui/material/TextField';
-function Login() {
-    return (
-        <>
 
+
+function Login() {
+
+    const [formData, setFormData] = useState({
+        username: "",
+        password: ""
+    });
+
+    const [error, setError] = useState(null);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setError(null);
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log("submit");
+        if (!formData.username || !formData.password) {
+            setError("Please fill in both username and password");
+            return;
+        }
+
+
+        try {
+            const response = await axios.post('http://localhost:3000/loginUser', formData, { withCredentials: true });
+            if (response.data.success) {
+                alert("Login successful! " + response.data.user.username);
+            }
+        }
+        catch (err) {
+            setError(err.response?.data?.message || "Something went wrong. Please try again.");
+        }
+    }
+    return (
+
+
+        <>
 
             <div className="container text-center mt-5">
                 <h2>Trade with confidence. Login for clarity</h2>
                 <div className="mt-2 border  d-inline-block " style={{ width: "30%", borderRadius: "10px", backgroundColor: "#e2d1ddff" }}>
                     <h2>Login</h2>
-                    <form className="mt-3  needs-validation" novalidate>
+                    {error && <p style={{ color: "red" }}>{error}</p>}
+                    <form className="mt-3  needs-validation" noValidate onSubmit={handleSubmit}>
 
 
                         <TextField
+                            name="username"
                             id="outlined-basic"
                             label="username"
                             variant="outlined"
@@ -28,8 +66,11 @@ function Login() {
                             }}
                             className='inputs'
                             required
+                            onChange={handleChange}
+                            value={formData.username}
                         />
                         <TextField
+                            name="password"
                             id="outlined-basic"
                             label="password"
                             variant="outlined"
@@ -43,7 +84,8 @@ function Login() {
                                 },
                             }}
                             className='inputs mt-2'
-                            required />
+                            required
+                            onChange={handleChange} value={formData.password} />
                         <button type="submit" className="login-button mt-3 ">login</button>
 
                         <div className="login-link m-3 px-5">
