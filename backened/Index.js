@@ -70,9 +70,11 @@ app.post("/stocks", async (req, res) => {
 // get all holdings
 app.get("/allHoldings", async (req, res) => {
   try {
+   
     let allHoldings = await HoldingsModel.find({}).lean();
     res.json(allHoldings);
     console.log(allHoldings);
+  
   }
   catch (err) {
     console.log(err);
@@ -165,13 +167,39 @@ app.post("/register", async (req, res) => {
 });
 
 
+
+app.post('/loginUser', (req, res, next) => {
+  const { username, password}  = req.body;
+  console.log(req.body);
+
+  // Custom validation
+  if (!username || !password) {
+    return res.status(400).json({
+      message: "Please fill in both username and password"
+    });
+  }
+
+  // If valid, call passport
+  passport.authenticate('local', (err, user, info) => {
+    if (err) return res.status(500).json({ message: "Server error" });
+    if (!user) return res.status(401).json({ message: info.message });
+
+    req.login(user, (err) => {
+      if (err) return res.status(500).json({ message: "Login failed" });
+      return res.json({ success: true, message: "Login successful", user });
+    });
+  })(req, res, next);
+});  
+
+
 app.get("/", (req, res) => {
   res.send("connected")
 });
 
-app.listen(PORT, () => {
-  console.log(`server running on port ${PORT}.......`);
-  mongoose.connect(mongoURL)
-    .then(() => console.log("✅ Successfully connected to MongoDB"))
-    .catch((err) => console.error("❌ MongoDB connection error:", err));
-}); 
+mongoose.connect(mongoURL)
+  .then(() => {
+    console.log("MongoDB connected");
+    app.listen(PORT, () => {
+      console.log(`Server running on ${PORT}`);
+    });
+  });
