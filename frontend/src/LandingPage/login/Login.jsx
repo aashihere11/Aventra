@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from "react-router-dom";
 import axios from "axios";
 import TextField from '@mui/material/TextField';
-
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
 
@@ -12,7 +12,7 @@ function Login() {
     });
 
     const [error, setError] = useState(null);
-
+     const navigate = useNavigate();
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
         setError(null);
@@ -28,9 +28,10 @@ function Login() {
 
 
         try {
-            const response = await axios.post('http://localhost:3000/loginUser', formData, { withCredentials: true });
+            const response = await axios.post('http://localhost:3000/login', formData, { withCredentials: true });
             if (response.data.success) {
-                alert("Login successful! " + response.data.user.username);
+                 navigate('/');
+                
             }
         }
         catch (err) {
