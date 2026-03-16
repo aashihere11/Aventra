@@ -9,10 +9,12 @@ const { OrdersModel } = require("./Models/OrdersModel");
 const { UsersModel } = require("./Models/UsersModel")
 const cors = require('cors');
 const finnhub = require('finnhub');
-const LocalStrategy = require('passport-local');
 const session = require('express-session');
-const passport = require('passport');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const app = express();
+app.use(cookieParser());
 
 
 const PORT = process.env.PORT || 3000;
@@ -21,15 +23,10 @@ app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:3000'],
   credentials: true
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: false }));
-app.use(passport.initialize());
-app.use(passport.session());
-passport.use(UsersModel.createStrategy());
-passport.serializeUser(UsersModel.serializeUser());
-passport.deserializeUser(UsersModel.deserializeUser());
 const finnhubClient = new finnhub.DefaultApi(process.env.FINNHUB_API_KEY)
 
 app.post("/stocks", async (req, res) => {
@@ -70,11 +67,11 @@ app.post("/stocks", async (req, res) => {
 // get all holdings
 app.get("/allHoldings", async (req, res) => {
   try {
-   
+
     let allHoldings = await HoldingsModel.find({}).lean();
     res.json(allHoldings);
     console.log(allHoldings);
-  
+
   }
   catch (err) {
     console.log(err);
@@ -146,50 +143,63 @@ app.post("/newOrder", async (req, res) => {
 });
 
 //user registration
-app.post("/register", async (req, res) => {
+app.post("/create", async (req, res) => {
   const { username, password, email } = req.body;
 
-  if (!username || !password || !email) {
-    return res.status(400).json({ message: "All fields are required." });
-  }
-  try {
-    const newUser = new UsersModel({ username, email });
-    const user = await UsersModel.register(newUser, password);
+  const existingUser = await UsersModel.findOne({
+    $or: [{ username }, { email }]
+  });
 
-    req.login(user, function (err) {
-      if (err) { return next(err); }
-      return res.status(200).json({ success: true });
+  if (existingUser) {
+    return res.status(400).json({
+      message: existingUser.username == username ? "username already taken!" : "email already registered!"
     });
   }
-  catch (err) {
-    res.status(400).json({ message: err.message });
-  }
+
+  bcrypt.genSalt(10, function (err, salt) {
+    bcrypt.hash(password, salt, async function (err, hash) {
+      const User = await UsersModel.create({
+        username,
+        email,
+        password: hash
+      })
+
+      const token = jwt.sign({ email }, process.env.JWT_SECRET);
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 604800000
+      });
+      res.status(201).json({ success: true, message: "User created successfully" });
+    });
+  });
 });
 
 
 
-app.post('/loginUser', (req, res, next) => {
-  const { username, password}  = req.body;
-  console.log(req.body);
-
-  // Custom validation
-  if (!username || !password) {
-    return res.status(400).json({
-      message: "Please fill in both username and password"
-    });
+app.post('/login', async (req, res) => {
+  const user = await UsersModel.findOne({ username: req.body.username });
+  if (!user) {
+    return res.status(404).json({ message: "something went wrong" });
   }
 
-  // If valid, call passport
-  passport.authenticate('local', (err, user, info) => {
-    if (err) return res.status(500).json({ message: "Server error" });
-    if (!user) return res.status(401).json({ message: info.message });
+  bcrypt.compare(req.body.password, user.password, function (err, result) {
+    if (result) {
+      const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET);
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 604800000
+      });
+      res.status(201).json({ success: true });
+    }
+    else {
+      return res.status(404).json({ message: "password is incorrect" });
+    }
+  })
 
-    req.login(user, (err) => {
-      if (err) return res.status(500).json({ message: "Login failed" });
-      return res.json({ success: true, message: "Login successful", user });
-    });
-  })(req, res, next);
-});  
+
+});
 
 
 app.get("/", (req, res) => {
