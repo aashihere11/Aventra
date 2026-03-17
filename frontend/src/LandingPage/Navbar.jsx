@@ -5,8 +5,12 @@ import PersonAddAltRoundedIcon from '@mui/icons-material/PersonAddAltRounded';
 import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
 import AttachMoneySharpIcon from '@mui/icons-material/AttachMoneySharp';
 import CrueltyFreeSharpIcon from '@mui/icons-material/CrueltyFreeSharp';
+import { useAuth } from "../context/AuthContext";
+
 
 function Navbar() {
+    const { user } = useAuth();
+    console.log(user);
     return (
         <nav
             class="navbar navbar-expand-lg border-bottom"
@@ -35,16 +39,24 @@ function Navbar() {
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <form class="d-flex" role="search">
                         <ul class="navbar-nav mb-lg-0">
-                            <li class="nav-item">
-                                <Link to="/login" class="nav-link active" >
-                                    login <LoginIcon/>
+                            {user ? (<li class="nav-item">
+                                <Link to="/logout" class="nav-link active" >
+                                    logout <LoginIcon />
                                 </Link >
-                            </li>
-                            <li class="nav-item">
-                                <Link to="/signup" class="nav-link active" aria-current="page" >
-                                    Signup <PersonAddAltRoundedIcon/>
-                                </Link >
-                            </li>
+                            </li>) :
+                                (<>
+                                    <li class="nav-item">
+                                        <Link to="/login" class="nav-link active" >
+                                            login <LoginIcon />
+                                        </Link >
+                                    </li>
+                                    <li class="nav-item">
+                                        <Link to="/signup" class="nav-link active" aria-current="page" >
+                                            Signup <PersonAddAltRoundedIcon />
+                                        </Link >
+                                    </li>
+                                </>)}
+
                             <li class="nav-item">
                                 <Link to="/about" class="nav-link active" >
                                     About
@@ -52,17 +64,17 @@ function Navbar() {
                             </li>
                             <li class="nav-item">
                                 <Link to="/product" class="nav-link active" >
-                                    Product <CrueltyFreeSharpIcon/>
+                                    Product <CrueltyFreeSharpIcon />
                                 </Link >
                             </li>
                             <li class="nav-item">
                                 <Link to="/pricing" class="nav-link active" >
-                                    Pricing <AttachMoneySharpIcon/>
+                                    Pricing <AttachMoneySharpIcon />
                                 </Link >
                             </li>
                             <li class="nav-item">
                                 <Link to="/support" class="nav-link active" >
-                                    Support <HelpOutlineRoundedIcon/>
+                                    Support <HelpOutlineRoundedIcon />
                                 </Link >
                             </li>
                         </ul>

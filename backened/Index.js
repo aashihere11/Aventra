@@ -146,14 +146,20 @@ app.post("/newOrder", async (req, res) => {
 app.post("/create", async (req, res) => {
   const { username, password, email } = req.body;
 
-  const existingUser = await UsersModel.findOne({
+  const isAlreadyRegistered = await UsersModel.findOne({
     $or: [{ username }, { email }]
   });
 
-  if (existingUser) {
-    return res.status(400).json({
-      message: existingUser.username == username ? "username already taken!" : "email already registered!"
+  if (isAlreadyRegistered) {
+    return res.status(409).json({
+      message:"username or email already exists"
     });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: "Invalid email format!" });
   }
 
   bcrypt.genSalt(10, function (err, salt) {
@@ -164,7 +170,7 @@ app.post("/create", async (req, res) => {
         password: hash
       })
 
-      const token = jwt.sign({ email }, process.env.JWT_SECRET);
+      const token = jwt.sign({ email, username }, process.env.JWT_SECRET);
       res.cookie("token", token, {
         httpOnly: true,
         secure: true,
