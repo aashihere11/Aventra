@@ -1,6 +1,6 @@
-import { jwtDecode } from "jwt-decode";
 import React from "react";
 import { createContext, useState, useEffect, useContext } from "react";
+import axios from "axios"
 
 const AuthContext = createContext();
 
@@ -8,21 +8,16 @@ export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const token = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('token='))
-            ?.split('=')[1];
-
-        if (token) {
-            const decoded = jwtDecode(token);
-            setUser(decoded);
-
-        }
+        axios.get('http://localhost:3000/me', { withCredentials: true })
+            .then(res => setUser(res.data.user))
+            .catch(() => setUser(null));
     }, []);
 
+    console.log(user);
+
     return (
-        <AuthContext.Provider value= {{user, setUser}}>
-        {children}
+        <AuthContext.Provider value={{ user, setUser }}>
+            {children}
         </AuthContext.Provider>
     );
 

@@ -142,6 +142,18 @@ app.post("/newOrder", async (req, res) => {
   }
 });
 
+app.get("/me", (req, res) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.json({ user: null });
+  }
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+  res.json({ user: decoded })
+});
+
 //user registration
 app.post("/create", async (req, res) => {
   const { username, password, email } = req.body;
@@ -152,7 +164,7 @@ app.post("/create", async (req, res) => {
 
   if (isAlreadyRegistered) {
     return res.status(409).json({
-      message:"username or email already exists"
+      message: "username or email already exists"
     });
   }
 
