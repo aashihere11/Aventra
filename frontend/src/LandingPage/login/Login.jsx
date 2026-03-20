@@ -3,16 +3,17 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import TextField from '@mui/material/TextField';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../../context/AuthContext.jsx";
 
 function Login() {
-
+    const { setUser } = useAuth();
     const [formData, setFormData] = useState({
         username: "",
         password: ""
     });
 
     const [error, setError] = useState(null);
-     const navigate = useNavigate();
+    const navigate = useNavigate();
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
         setError(null);
@@ -20,7 +21,7 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("submit");
+        
         if (!formData.username || !formData.password) {
             setError("Please fill in both username and password");
             return;
@@ -30,8 +31,9 @@ function Login() {
         try {
             const response = await axios.post('http://localhost:3000/login', formData, { withCredentials: true });
             if (response.data.success) {
-                 navigate('/');
-                
+                setUser(response.data.user)
+                navigate('/');
+
             }
         }
         catch (err) {

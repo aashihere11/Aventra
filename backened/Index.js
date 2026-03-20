@@ -209,10 +209,13 @@ app.post('/login', async (req, res) => {
         secure: true,
         maxAge: 604800000
       });
-      res.status(201).json({ success: true });
+      res.status(201).json({ success: true, user: { username: user, email: user.email } });
     }
     else {
-      return res.status(404).json({ message: "password is incorrect" });
+      return res.status(404).json({
+        message: "password is incorrect"
+
+      });
     }
   })
 
