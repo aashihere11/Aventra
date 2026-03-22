@@ -20,7 +20,7 @@ app.use(cookieParser());
 const PORT = process.env.PORT || 3000;
 const mongoURL = process.env.MONGO_URL;
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5174'],
   credentials: true
 }));
 
@@ -29,40 +29,40 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: false }));
 const finnhubClient = new finnhub.DefaultApi(process.env.FINNHUB_API_KEY)
 
-app.post("/stocks", async (req, res) => {
-  const symbols = req.body.symbols;
-  const results = [];
-  for (const symbol of symbols) {
-    try {
-      const data = await new Promise((resolve, reject) => {
-        finnhubClient.quote(symbol, (error, data) => {
-          if (error) {
-            reject(error);
-          }
-          else {
-            resolve(data);
-          }
-        });
-      });
+// app.post("/stocks", async (req, res) => {
+//   const symbols = req.body.symbols;
+//   const results = [];
+//   for (const symbol of symbols) {
+//     try {
+//       const data = await new Promise((resolve, reject) => {
+//         finnhubClient.quote(symbol, (error, data) => {
+//           if (error) {
+//             reject(error);
+//           }
+//           else {
+//             resolve(data);
+//           }
+//         });
+//       });
 
-      results.push({
-        symbol: symbol,
-        price: data.c,
-        previousClose: data.pc,
-        percentChange: ((data.c - data.pc) / data.pc * 100).toFixed(2),
-        lastUpdated: new Date().toISOString().slice(0, 19).replace("T", " ")
+//       results.push({
+//         symbol: symbol,
+//         price: data.c,
+//         previousClose: data.pc,
+//         percentChange: ((data.c - data.pc) / data.pc * 100).toFixed(2),
+//         lastUpdated: new Date().toISOString().slice(0, 19).replace("T", " ")
 
-      });
+//       });
 
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-    catch (err) {
-      console.error(`Failed to fetch ${symbol}:`, err);
-    }
+//       await new Promise(resolve => setTimeout(resolve, 500));
+//     }
+//     catch (err) {
+//       console.error(`Failed to fetch ${symbol}:`, err);
+//     }
 
-  }
-  res.json(results);
-})
+//   }
+//   res.json(results);
+// })
 
 // get all holdings
 app.get("/allHoldings", async (req, res) => {
@@ -185,7 +185,9 @@ app.post("/create", async (req, res) => {
       const token = jwt.sign({ email, username }, process.env.JWT_SECRET);
       res.cookie("token", token, {
         httpOnly: true,
-        secure: true,
+        secure: false,
+        sameSite: "lax",
+         path: "/",
         maxAge: 604800000
       });
       res.status(201).json({ success: true, message: "User created successfully" });
@@ -206,7 +208,9 @@ app.post('/login', async (req, res) => {
       const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET);
       res.cookie("token", token, {
         httpOnly: true,
-        secure: true,
+        secure: false,
+        sameSite: "lax",
+         path: "/",
         maxAge: 604800000
       });
       res.status(201).json({ success: true, user: { username: user, email: user.email } });
@@ -221,6 +225,22 @@ app.post('/login', async (req, res) => {
 
 
 });
+
+app.post("/logout", (req, res) => {
+ try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      path: "/", 
+    });
+
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.log("Logout error:", error);
+    return res.status(500).json({ success: false });
+  }
+})
 
 
 app.get("/", (req, res) => {

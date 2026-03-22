@@ -1,13 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import { Link } from "react-router-dom";
+import axios from 'axios';
 
 const Menu = () => {
     const [selectedMenu, setSelectedMenu] = useState(0);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+    const [user, setUser] = useState("");
 
+    useEffect(() => {
+
+        axios.get('http://localhost:3000/me', { withCredentials: true })
+            .then(res => setUser(res.data.user))
+            .catch(() => setUser(null))
+
+    }, []);
+
+    const handleLogout = async (e) => {
+        e.preventDefault();
+        
+        try {
+            const response = await axios.post('http://localhost:3000/logout', {}, { withCredentials: true })
+            
+            if (response?.data?.success) {
+                window.location.href = "http://localhost:5173/";
+            }
+        }
+
+        catch (error) {
+            console.log(error);
+        }
+
+    }
     const handleMenuClick = (index) => {
         setSelectedMenu(index);
     };
@@ -92,15 +118,15 @@ const Menu = () => {
                 <div className="profile" >
 
 
-                    <div className="dropdown" style={{width:"50%"}}>
+                    <div className="dropdown" style={{ width: "50%" }}>
                         <button className="profile-button d-flex mt-2 align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <div className="avatar">ZU</div>
-                            <p className="username mt-3 ">USERID</p>
+                            <p className="username mt-3 ">{user.email}</p>
                         </button>
                         <ul className="dropdown-menu mt-1 text-center"  >
-                            <li><a class="dropdown-item" href="#">Profile  <AccountCircleRoundedIcon/></a></li>
-                            <li><a class="dropdown-item" href="#">Settings <ManageAccountsIcon/></a></li>
-                            <li><a class="dropdown-item" href="#">Logout <LogoutIcon/></a></li>
+                            <li><a class="dropdown-item" href="#">Profile  <AccountCircleRoundedIcon /></a></li>
+                            <li><a class="dropdown-item" href="#">Settings <ManageAccountsIcon /></a></li>
+                            <li><a className="dropdown-item" href="#" onClick={handleLogout}>Logout <LogoutIcon /></a></li>
                         </ul>
                     </div>
                 </div>

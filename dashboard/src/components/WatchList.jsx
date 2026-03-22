@@ -13,15 +13,15 @@ const WatchList = () => {
     const [watchlist, setWatchlist] = useState([]);
      const symbols = ["INFY", "TCS", "ORCL", "TSLA", "AMZN", "ADBE", "NVDA", "AAPL", "GOOGL", "MSFT"];
   
-    useEffect(() =>{
-       axios.post("http://localhost:3000/stocks", {symbols})
-       .then((response)=>{
-        setWatchlist(response.data);
-       })
-       .catch((error)=>{
-        console.log("Error fetching stock data", error);
-       })
-    }, []);
+    // useEffect(() =>{
+    //    axios.post("http://localhost:3000/stocks", {symbols})
+    //    .then((response)=>{
+    //     setWatchlist(response.data);
+    //    })
+    //    .catch((error)=>{
+    //     console.log("Error fetching stock data", error);
+    //    })
+    // }, []);
     const data = {
         labels: watchlist.map((stock) => stock.symbol),
         datasets: [

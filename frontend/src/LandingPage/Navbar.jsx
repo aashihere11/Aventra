@@ -41,9 +41,10 @@ function Navbar() {
                             {!loading && (
                                 <>
                                     {user ? (<li class="nav-item">
-                                        <Link to="/logout" class="nav-link active" >
-                                            logout <LoginIcon />
-                                        </Link >
+                                        <a href="http://localhost:5174/dashboard" className="nav-link">
+                                            Dashboard
+                                        </a>
+
                                     </li>) :
                                         (<>
                                             <li class="nav-item">
