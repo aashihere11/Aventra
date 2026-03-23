@@ -1,15 +1,35 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
 import PersonAddAltRoundedIcon from '@mui/icons-material/PersonAddAltRounded';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
 import AttachMoneySharpIcon from '@mui/icons-material/AttachMoneySharp';
 import CrueltyFreeSharpIcon from '@mui/icons-material/CrueltyFreeSharp';
 import { useAuth } from "../context/AuthContext";
+import axios from 'axios';
 
 
 function Navbar() {
     const { user, loading } = useAuth();
+
+    const handleLogout = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await axios.post('http://localhost:3000/logout', {}, { withCredentials: true })
+
+            if (response?.data?.success) {
+                window.location.href = "http://localhost:5173/";
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
+
+    }
+
     return (
         <nav
             class="navbar navbar-expand-lg border-bottom"
@@ -40,12 +60,18 @@ function Navbar() {
                         <ul class="navbar-nav mb-lg-0">
                             {!loading && (
                                 <>
-                                    {user ? (<li class="nav-item">
-                                        <a href="http://localhost:5174/dashboard" className="nav-link">
-                                            Dashboard
-                                        </a>
+                                    {user ? (<>
+                                        <li class="nav-item">
+                                            <a href="#t" className="nav-link" onClick={handleLogout}>
+                                                Logout<LogoutIcon /></a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="http://localhost:5174/dashboard" className="nav-link">
+                                                Dashboard<DashboardIcon /></a>
 
-                                    </li>) :
+                                        </li>
+
+                                    </>) :
                                         (<>
                                             <li class="nav-item">
                                                 <Link to="/login" class="nav-link active" >
