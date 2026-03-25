@@ -17,7 +17,7 @@ export const GeneralContextProvider = (props) => {
         setIsBuyWindowOpen(true);
         setSelectedStockUID(uid);
         setSelectedStockPrice(price);
-        setPrevclose(pc);
+        setPrevClose(pc);
     };
 
     const handleCloseBuyWindow = () => {

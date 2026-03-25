@@ -5,92 +5,92 @@ const Holdings = () => {
     const [holdings, setHoldings] = useState([]);
 
     useEffect(() => {
-        axios.get("http://localhost:3000/allHoldings")
-            .then((response) => {
-                setHoldings(response.data);
-            })
-            .catch((error) => {
-                console.error("Error fetching holdings:", error);
-            });
-    }, []);
+        axios.get("http://localhost:3000/allHoldings", { withCredentials: true })
+        .then((response) => {
+            setHoldings(response.data);
+        })
+        .catch((error) => {
+            console.error("Error fetching holdings:", error);
+        });
+}, []);
 
-    const labels = holdings.map((stock) => stock.name);
+const labels = holdings.map((stock) => stock.name);
 
-    const data = {
-        labels,
-        datasets: [
-            {
-                label: "holdings value",
-                data: holdings.map((stock) => stock.price),
-                borderColor: '#001f4d',
-                backgroundColor: '#a4daf0',
-            },
+const data = {
+    labels,
+    datasets: [
+        {
+            label: "holdings value",
+            data: holdings.map((stock) => stock.price),
+            borderColor: '#001f4d',
+            backgroundColor: '#a4daf0',
+        },
 
-        ],
-    };
-    return (
-        <>
-            <h3 className="title">{holdings.length} holdings</h3>
+    ],
+};
+return (
+    <>
+        <h3 className="title">{holdings.length} holdings</h3>
 
-            <div className="order-table">
-                <table>
-                    <tr>
-                        <th>Instrument</th>
-                        <th>Qty.</th>
-                        <th>Avg. cost</th>
-                        <th>LTP</th>
-                        <th>Cur. val</th>
-                        <th>PL</th>
-                        <th>Net chg.</th>
-                        <th>Day chg.</th>
-                    </tr>
-                     
-                    {holdings.map((stock, index) => {
-                        const curValue = stock.price * stock.qty; 
-                        const isProfit = curValue - stock.avg * stock.qty >= 0.0;
-                        const profClass = isProfit ? "profit" : "loss";
+        <div className="order-table">
+            <table>
+                <tr>
+                    <th>Instrument</th>
+                    <th>Qty.</th>
+                    <th>Avg. cost</th>
+                    <th>LTP</th>
+                    <th>Cur. val</th>
+                    <th>PL</th>
+                    <th>Net chg.</th>
+                    <th>Day chg.</th>
+                </tr>
 
-                        return (
-                            <tr key={index}>
-                                <td>{stock.name}</td>
-                                <td>{stock.qty}</td>
-                                <td>{stock.avg.toFixed(2)}</td>
-                                <td>{stock.price.toFixed(2)}</td>
-                                <td>{curValue.toFixed(2)}</td>
-                                <td className={profClass}>
-                                    {(curValue - stock.avg * stock.qty).toFixed(2)}
-                                </td>
-                                <td className={profClass}>{stock.net > 0 ? "+": "-"}{stock.net.toFixed(2)}</td>
-                                <td className={profClass}>{stock.day > 0 ? "+": "-"}{stock.day.toFixed(2)}</td>
-                            </tr>
-                        );
-                    })}
-                </table>
+                {holdings.map((stock, index) => {
+                    const curValue = stock.price * stock.qty;
+                    const isProfit = curValue - stock.avg * stock.qty >= 0.0;
+                    const profClass = isProfit ? "profit" : "loss";
+
+                    return (
+                        <tr key={index}>
+                            <td>{stock.name}</td>
+                            <td>{stock.qty}</td>
+                            <td>{stock.avg.toFixed(2)}</td>
+                            <td>{stock.price.toFixed(2)}</td>
+                            <td>{curValue.toFixed(2)}</td>
+                            <td className={profClass}>
+                                {(curValue - stock.avg * stock.qty).toFixed(2)}
+                            </td>
+                            <td className={profClass}>{stock.net > 0 ? "+" : "-"}{stock.net.toFixed(2)}</td>
+                            <td className={profClass}>{stock.day > 0 ? "+" : "-"}{stock.day.toFixed(2)}</td>
+                        </tr>
+                    );
+                })}
+            </table>
+        </div>
+
+        <div className="row">
+            <div className="col">
+
+                <h5>
+                    29,875.<span>55</span>{" "}
+                </h5>
+                <p>Total investment</p>
+            </div>
+            <div className="col">
+                <h5>
+                    31,428.<span>95</span>{" "}
+                </h5>
+                <p>Current value</p>
+            </div>
+            <div className="col">
+                <h5>1,553.40 (+5.20%)</h5>
+                <p>P&L</p>
             </div>
 
-            <div className="row">
-                <div className="col">
-                    
-                    <h5>
-                        29,875.<span>55</span>{" "}
-                    </h5>
-                    <p>Total investment</p>
-                </div>
-                <div className="col">
-                    <h5>
-                        31,428.<span>95</span>{" "}
-                    </h5>
-                    <p>Current value</p>
-                </div>
-                <div className="col">
-                    <h5>1,553.40 (+5.20%)</h5>
-                    <p>P&L</p>
-                </div>
-
-            </div>
-            <LineChart data={data} />
-        </>
-    );
+        </div>
+        <LineChart data={data} />
+    </>
+);
 };
 
 export default Holdings;

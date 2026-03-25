@@ -14,6 +14,8 @@ const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const app = express();
+const isLoggedIn = require('./middleware/auth.js');
+const { isErrored } = require('stream');
 app.use(cookieParser());
 
 
@@ -29,46 +31,47 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: false }));
 const finnhubClient = new finnhub.DefaultApi(process.env.FINNHUB_API_KEY)
 
-// app.post("/stocks", async (req, res) => {
-//   const symbols = req.body.symbols;
-//   const results = [];
-//   for (const symbol of symbols) {
-//     try {
-//       const data = await new Promise((resolve, reject) => {
-//         finnhubClient.quote(symbol, (error, data) => {
-//           if (error) {
-//             reject(error);
-//           }
-//           else {
-//             resolve(data);
-//           }
-//         });
-//       });
+app.post("/stocks", async (req, res) => {
+  const symbols = req.body.symbols;
+  const results = [];
+  for (const symbol of symbols) {
+    try {
+      const data = await new Promise((resolve, reject) => {
+        finnhubClient.quote(symbol, (error, data) => {
+          if (error) {
+            reject(error);
+          }
+          else {
+            resolve(data);
+          }
+        });
+      });
 
-//       results.push({
-//         symbol: symbol,
-//         price: data.c,
-//         previousClose: data.pc,
-//         percentChange: ((data.c - data.pc) / data.pc * 100).toFixed(2),
-//         lastUpdated: new Date().toISOString().slice(0, 19).replace("T", " ")
+      results.push({
+        symbol: symbol,
+        price: data.c,
+        previousClose: data.pc,
+        percentChange: ((data.c - data.pc) / data.pc * 100).toFixed(2),
+        lastUpdated: new Date().toISOString().slice(0, 19).replace("T", " ")
 
-//       });
+      });
 
-//       await new Promise(resolve => setTimeout(resolve, 500));
-//     }
-//     catch (err) {
-//       console.error(`Failed to fetch ${symbol}:`, err);
-//     }
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    catch (err) {
+      console.error(`Failed to fetch ${symbol}:`, err);
+    }
 
-//   }
-//   res.json(results);
-// })
+  }
+  res.json(results);
+})
 
 // get all holdings
-app.get("/allHoldings", async (req, res) => {
+app.get("/allHoldings", isLoggedIn, async (req, res) => {
+  const user = req.user;
   try {
 
-    let allHoldings = await HoldingsModel.find({}).lean();
+    let allHoldings = await HoldingsModel.find({ userId: user.user_id });
     res.json(allHoldings);
     console.log(allHoldings);
 
@@ -87,17 +90,22 @@ app.get("/allPositions", async (req, res) => {
 
 
 // get all orders
-app.get("/allOrders", async (req, res) => {
-  let allOrders = await OrdersModel.find({}).lean();
+app.get("/allOrders", isLoggedIn, async (req, res) => {
+  const user = req.user;
+  let allOrders = await OrdersModel.find({ userId: user.user_id });
   res.json(allOrders);
 });
 
 
 // create new order
-app.post("/newOrder", async (req, res) => {
+app.post("/newOrder", isLoggedIn, async (req, res) => {
   const { name, qty, price, mode, pc } = req.body;
+
+  const user = req.user;
+
   try {
     let newOrder = new OrdersModel({
+      userId: user._id,
       name: name,
       qty: qty,
       price: price,
@@ -110,7 +118,7 @@ app.post("/newOrder", async (req, res) => {
 
     //Update Holdings accordingly
 
-    const holding = await HoldingsModel.findOne({ name });
+    const holding = await HoldingsModel.findOne({ userId: user._id, name: name });
     if (mode === "BUY") {
 
       const totalqty = holding ? holding.qty + qty : qty;
@@ -120,7 +128,8 @@ app.post("/newOrder", async (req, res) => {
       const investment = totalqty * avgPrice;
 
       await HoldingsModel.updateOne(
-        { name: name },
+        { userId: user._id, name: name },
+
         {
           $set: {
             qty: totalqty,
@@ -142,16 +151,11 @@ app.post("/newOrder", async (req, res) => {
   }
 });
 
-app.get("/me", (req, res) => {
-  const token = req.cookies.token;
+app.get("/me", isLoggedIn, (req, res) => {
 
-  if (!token) {
-    return res.json({ user: null });
-  }
+  const user = req.user;
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-  res.json({ user: decoded })
+  res.json({ user });
 });
 
 //user registration
@@ -187,7 +191,7 @@ app.post("/create", async (req, res) => {
         httpOnly: true,
         secure: false,
         sameSite: "lax",
-         path: "/",
+        path: "/",
         maxAge: 604800000
       });
       res.status(201).json({ success: true, message: "User created successfully" });
@@ -210,7 +214,7 @@ app.post('/login', async (req, res) => {
         httpOnly: true,
         secure: false,
         sameSite: "lax",
-         path: "/",
+        path: "/",
         maxAge: 604800000
       });
       res.status(201).json({ success: true, user: { username: user, email: user.email } });
@@ -227,12 +231,12 @@ app.post('/login', async (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
- try {
+  try {
     res.clearCookie("token", {
       httpOnly: true,
       secure: false,
       sameSite: "lax",
-      path: "/", 
+      path: "/",
     });
 
     return res.status(200).json({ success: true });

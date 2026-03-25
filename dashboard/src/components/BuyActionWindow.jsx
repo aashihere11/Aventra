@@ -12,6 +12,7 @@ const BuyActionWindow = ({ uid, price, pc }) => {
 
 
     const handleBuyClick = async () => {
+         generalContext.closeBuyWindow();
         try {
             await axios.post("http://localhost:3000/newOrder", {
                 name: uid,
@@ -19,12 +20,13 @@ const BuyActionWindow = ({ uid, price, pc }) => {
                 price: totalprice,
                 pc: pc,
                 mode: "BUY",
-            });
-            generalContext.closeBuyWindow();
+            },  {withCredentials: true});
+            
         }
         catch (err) {
-            console.log(err);
+            console.log(err , "something is wrong");
         }
+       
     };
 
     const handleCancelClick = () => {

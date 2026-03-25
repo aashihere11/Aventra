@@ -1,7 +1,13 @@
 const { Schema } = require("mongoose");
+const mongoose = require("mongoose");
 
 const HoldingsSchema = new Schema({
-    name: {type: String, index:true},
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+    name: { type: String, index: true },
     qty: Number,
     avg: Number,
     price: Number,

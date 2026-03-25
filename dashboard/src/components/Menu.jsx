@@ -9,11 +9,12 @@ const Menu = () => {
     const [selectedMenu, setSelectedMenu] = useState(0);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [user, setUser] = useState("");
+   
 
     useEffect(() => {
 
         axios.get('http://localhost:3000/me', { withCredentials: true })
-            .then(res => setUser(res.data.user))
+            .then(res => setUser(res.data.user.username))
             .catch(() => setUser(null))
 
     }, []);
@@ -120,8 +121,8 @@ const Menu = () => {
 
                     <div className="dropdown" style={{ width: "50%" }}>
                         <button className="profile-button d-flex mt-2 align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div className="avatar">ZU</div>
-                            <p className="username mt-3 ">{user.email}</p>
+                            <div className="avatar">{user?.charAt(0).toUpperCase()}</div>
+                            <p className="username mt-3 ">{user}</p>
                         </button>
                         <ul className="dropdown-menu mt-1 text-center"  >
                             <li><a class="dropdown-item" href="#">Profile  <AccountCircleRoundedIcon /></a></li>
