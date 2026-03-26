@@ -70,10 +70,8 @@ app.post("/stocks", async (req, res) => {
 app.get("/allHoldings", isLoggedIn, async (req, res) => {
   const user = req.user;
   try {
-
-    let allHoldings = await HoldingsModel.find({ userId: user.user_id });
+   let allHoldings = await HoldingsModel.find({ userId: user._id });
     res.json(allHoldings);
-    console.log(allHoldings);
 
   }
   catch (err) {
@@ -92,7 +90,7 @@ app.get("/allPositions", async (req, res) => {
 // get all orders
 app.get("/allOrders", isLoggedIn, async (req, res) => {
   const user = req.user;
-  let allOrders = await OrdersModel.find({ userId: user.user_id });
+  let allOrders = await OrdersModel.find({ userId: user._id });
   res.json(allOrders);
 });
 
