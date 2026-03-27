@@ -8,25 +8,28 @@ const BuyActionWindow = ({ uid, price, pc }) => {
 
     const generalContext = useContext(GeneralContext);
     const [stockQuantity, setStockQuantity] = useState(1);
+    const [product, setProduct] = useState("CNC");
     const totalprice = stockQuantity * price.toFixed(2);
 
 
     const handleBuyClick = async () => {
-         generalContext.closeBuyWindow();
+        generalContext.closeBuyWindow();
         try {
             await axios.post("http://localhost:3000/newOrder", {
+                product: product,
                 name: uid,
                 qty: stockQuantity,
                 price: totalprice,
                 pc: pc,
                 mode: "BUY",
-            },  {withCredentials: true});
-            
+
+            }, { withCredentials: true });
+
         }
         catch (err) {
-            console.log(err , "something is wrong");
+            console.log(err, "something is wrong");
         }
-       
+
     };
 
     const handleCancelClick = () => {
@@ -47,6 +50,12 @@ const BuyActionWindow = ({ uid, price, pc }) => {
                             value={stockQuantity}
                         />
                     </fieldset>
+                    <select name="product"
+                        onChange={(e) => setProduct(e.target.value)}
+                        value={product}>
+                        <option value="CNC">CNC</option>
+                        <option value="MIS">MIS</option>
+                    </select>
                     <fieldset>
                         <legend>Price</legend>
                         <input

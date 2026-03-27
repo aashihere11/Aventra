@@ -57,6 +57,8 @@ app.post("/stocks", async (req, res) => {
       });
 
       await new Promise(resolve => setTimeout(resolve, 500));
+
+      await PositionsModel.updateMany({ name: symbol }, { $set: { price: data.c } });
     }
     catch (err) {
       console.error(`Failed to fetch ${symbol}:`, err);
@@ -70,7 +72,7 @@ app.post("/stocks", async (req, res) => {
 app.get("/allHoldings", isLoggedIn, async (req, res) => {
   const user = req.user;
   try {
-   let allHoldings = await HoldingsModel.find({ userId: user._id });
+    let allHoldings = await HoldingsModel.find({ userId: user._id });
     res.json(allHoldings);
 
   }
@@ -94,10 +96,73 @@ app.get("/allOrders", isLoggedIn, async (req, res) => {
   res.json(allOrders);
 });
 
+async function updateHoldings(user, { name, qty, price, mode, pc }) {
 
+
+  const holding = await HoldingsModel.findOne({ userId: user._id, name: name });
+  if (mode === "BUY") {
+
+    const totalqty = holding ? holding.qty + qty : qty;
+    const totalprice = holding ? holding.price + price : price;
+    const avgPrice = (holding ? holding.avg * holding.qty + price * qty : totalprice) / totalqty;
+    const curValue = totalqty * totalprice;
+    const investment = totalqty * avgPrice;
+
+    await HoldingsModel.updateOne(
+      { userId: user._id, name: name },
+
+      {
+        $set: {
+          qty: totalqty,
+          avg: avgPrice,
+          price: totalprice,
+          net: curValue - investment,
+          day: curValue - (pc * qty)
+        }
+
+      },
+      { upsert: true }
+    );
+
+
+  }
+}
+
+async function updatePosition(user, { name, qty, price, mode, product }) {
+  try {
+    const position = await PositionsModel.findOne({ userId: user._id, name, product });
+    if (mode == "BUY") {
+      const totalqty = position ? position.qty + qty : qty;
+      const totalprice = position ? position.price + price : price;
+      const avgPrice = (position ? position.avg * position.qty + price * qty : totalprice) / totalqty;
+
+      await PositionsModel.updateOne(
+        { userId: user._id, name: name, product },
+
+        {
+          $set: {
+            product: product,
+            name: name,
+            qty: totalqty,
+            avg: avgPrice,
+          }
+
+        },
+        { upsert: true }
+      );
+
+
+    }
+  }
+
+  catch (error) {
+    console.log(error);
+
+  }
+}
 // create new order
 app.post("/newOrder", isLoggedIn, async (req, res) => {
-  const { name, qty, price, mode, pc } = req.body;
+  const { name, qty, price, mode, pc, product } = req.body;
 
   const user = req.user;
 
@@ -112,36 +177,13 @@ app.post("/newOrder", isLoggedIn, async (req, res) => {
 
     await newOrder.save();
 
+    // update positions
 
+    await updatePosition(user, { name, qty, price, mode, product });
 
     //Update Holdings accordingly
-
-    const holding = await HoldingsModel.findOne({ userId: user._id, name: name });
-    if (mode === "BUY") {
-
-      const totalqty = holding ? holding.qty + qty : qty;
-      const totalprice = holding ? holding.price + price : price;
-      const avgPrice = (holding ? holding.avg * holding.qty + price * qty : totalprice) / totalqty;
-      const curValue = totalqty * totalprice;
-      const investment = totalqty * avgPrice;
-
-      await HoldingsModel.updateOne(
-        { userId: user._id, name: name },
-
-        {
-          $set: {
-            qty: totalqty,
-            avg: avgPrice,
-            price: totalprice,
-            net: curValue - investment,
-            day: curValue - (pc * qty)
-          }
-
-        },
-        { upsert: true }
-      );
-
-
+    if (product == "CNS") {
+      await updateHoldings(user, { name, qty, price, mode, pc });
     }
   }
   catch (err) {

@@ -22,9 +22,10 @@ const Positions = () => {
                         <th>Instrument</th>
                         <th>Qty.</th>
                         <th>Avg.</th>
-                        <th>LTP</th>
+                        <th>price</th>
+                        {/* <th>LTP</th>
                         <th>P&L</th>
-                        <th>Chg.</th>
+                       // <th>Chg.</th>// */}
                     </tr>
                     {positions.map((stock, index) => {
                         const curValue = stock.price * stock.qty;
@@ -39,10 +40,10 @@ const Positions = () => {
                                 <td>{stock.qty}</td>
                                 <td>{stock.avg.toFixed(2)}</td>
                                 <td>{stock.price.toFixed(2)}</td>
-                                <td className={profClass}>
+                                {/* <td className={profClass}>
                                     {(curValue - stock.avg * stock.qty).toFixed(2)}
                                 </td>
-                                <td className={dayClass}>{stock.day}</td>
+                                <td className={dayClass}>{stock.day}</td> */}
                             </tr>
                         );
                     })}
