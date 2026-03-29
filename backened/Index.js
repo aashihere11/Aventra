@@ -15,7 +15,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const app = express();
 const isLoggedIn = require('./middleware/auth.js');
-const { isErrored } = require('stream');
+const axios = require('axios');
 app.use(cookieParser());
 
 
@@ -28,8 +28,48 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(session({ secret: 'secret', resave: false, saveUninitialized: false }));
+
 const finnhubClient = new finnhub.DefaultApi(process.env.FINNHUB_API_KEY)
+
+//searching and fetching stocks
+app.get("/search", async (req, res) => {
+  const query = req.query.q;
+  const results = [];
+
+  try {
+    const { data } = await axios.get("https://finnhub.io/api/v1/search",
+      { params: { q: query, token: process.env.FINNHUB_API_KEY } });
+
+    const top5 = data.result.slice(0, 5);
+
+    for (const item of top5) {
+      const quote = await new Promise((resolve, reject) => {
+        finnhubClient.quote(item, (error, data, response) => {
+          if (error) {
+            reject(error);
+          }
+          else {
+            resolve(data);
+          }
+        });
+      });
+
+      results.push({
+        symbol: item.symbol,
+        price: quote.c,
+        previousClose: quote.pc,
+        percentChange: ((quote.c - quote.pc) / quote.pc * 100).toFixed(2),
+        lastUpdated: new Date().toISOString().slice(0, 19).replace("T", " ")
+      });
+    }
+
+  }
+  catch (err) {
+    console.error("Failed to fetch :", err);
+  }
+  console.log(results);
+  res.json(results);
+});
 
 app.post("/stocks", async (req, res) => {
   const symbols = req.body.symbols;
