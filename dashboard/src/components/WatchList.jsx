@@ -1,4 +1,4 @@
-import React, { useState, useContext , useEffect} from "react";
+import React, { useState, useContext, useEffect } from "react";
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -11,17 +11,20 @@ import axios from "axios";
 
 const WatchList = () => {
     const [watchlist, setWatchlist] = useState([]);
-     const symbols = ["INFY", "TCS", "ORCL", "TSLA", "AMZN", "ADBE", "NVDA", "AAPL", "GOOGL", "MSFT"];
-  
-    useEffect(() =>{
-       axios.post("http://localhost:3000/stocks", {symbols})
-       .then((response)=>{
-        setWatchlist(response.data);
-       })
-       .catch((error)=>{
-        console.log("Error fetching stock data", error);
-       })
-    }, []);
+    const [search, setSearch] = useState("");
+
+    const handleSearch = async () => {
+        console.log(search);
+        try {
+            const response = await axios.get("http://localhost:3000/search", {params: { q: search }})
+            setWatchlist(response.data);
+            console.log(response.data);
+        }
+        catch (error) {
+            console.log("Error fetching stock data", error);
+        }
+    };
+    
     const data = {
         labels: watchlist.map((stock) => stock.symbol),
         datasets: [
@@ -58,8 +61,12 @@ const WatchList = () => {
                     id="search"
                     placeholder="Search eg:infy, bse, nifty fut weekly, gold mcx"
                     className="search"
+                    onChange={(e) => setSearch(e.target.value)}
+                    value={search}
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
                 />
-                <span className="counts">{watchlist.length} /50</span>
+                <button onClick={handleSearch}>search</button>
+                {/* <span className="counts">{watchlist.length} /50</span> */}
             </div>
 
             <ul className="list"> {watchlist.map((stock, index) => {
