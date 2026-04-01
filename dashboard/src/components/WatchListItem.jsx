@@ -32,7 +32,7 @@ const WatchListItem = ({ stock, isFav, onFavChange, favSymbols }) => {
                 onFavChange={onFavChange}
                 favSymbols={favSymbols}
                 uid={stock.symbol}
-                price={stock.currentprice}
+                price={stock.price}
                 pc={stock.previousClose} />}
         </li>
     );

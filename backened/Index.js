@@ -79,7 +79,7 @@ app.get("/search", async (req, res) => {
     const { data } = await axios.get("https://finnhub.io/api/v1/search",
       { params: { q: query, token: process.env.FINNHUB_API_KEY } });
 
-   const filteredResults = data.result.filter(stock => !stock.symbol.includes("."));
+   const filteredResults = data.result.slice(0, 5).map(stock => stock.symbol);
 
     const results = await getQuote(filteredResults);
     res.json(results);
@@ -90,11 +90,6 @@ app.get("/search", async (req, res) => {
 
 });
 
-app.get("/getFavorites", isLoggedIn, async (req, res) => {
-  const user = req.user;
-  const favorites = await FavoritesModel.find({ userId: user._id }).lean();
-  res.json(favorites);
-})
 
 //adding and deleting favorites
 
