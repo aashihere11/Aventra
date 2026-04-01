@@ -7,6 +7,7 @@ const { HoldingsModel } = require("./Models/HoldingsModel");
 const { PositionsModel } = require("./Models/PositionsModel");
 const { OrdersModel } = require("./Models/OrdersModel");
 const { UsersModel } = require("./Models/UsersModel")
+const { FavoritesModel } = require("./Models/FavoritesModel");
 const cors = require('cors');
 const finnhub = require('finnhub');
 const session = require('express-session');
@@ -28,51 +29,10 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 const finnhubClient = new finnhub.DefaultApi(process.env.FINNHUB_API_KEY)
 
-//searching and fetching stocks
-app.get("/search", async (req, res) => {
-  const query = req.query.q;
-  const results = [];
 
-  try {
-    const { data } = await axios.get("https://finnhub.io/api/v1/search",
-      { params: { q: query, token: process.env.FINNHUB_API_KEY } });
-
-    const top5 = data.result.slice(0, 5);
-
-    for (const item of top5) {
-      const quote = await new Promise((resolve, reject) => {
-        finnhubClient.quote(item, (error, data, response) => {
-          if (error) {
-            reject(error);
-          }
-          else {
-            resolve(data);
-          }
-        });
-      });
-
-      results.push({
-        symbol: item.symbol,
-        price: quote.c,
-        previousClose: quote.pc,
-        percentChange: ((quote.c - quote.pc) / quote.pc * 100).toFixed(2),
-        lastUpdated: new Date().toISOString().slice(0, 19).replace("T", " ")
-      });
-    }
-
-  }
-  catch (err) {
-    console.error("Failed to fetch :", err);
-  }
-  console.log(results);
-  res.json(results);
-});
-
-app.post("/stocks", async (req, res) => {
-  const symbols = req.body.symbols;
+async function getQuote(symbols) {
   const results = [];
   for (const symbol of symbols) {
     try {
@@ -105,6 +65,71 @@ app.post("/stocks", async (req, res) => {
     }
 
   }
+console.log(results)
+  return results;
+}
+
+
+//searching and fetching stocks
+app.get("/search", async (req, res) => {
+  const query = req.query.q;
+  console.log(query);
+
+  try {
+    const { data } = await axios.get("https://finnhub.io/api/v1/search",
+      { params: { q: query, token: process.env.FINNHUB_API_KEY } });
+
+   const filteredResults = data.result.filter(stock => !stock.symbol.includes("."));
+
+    const results = await getQuote(filteredResults);
+    res.json(results);
+  }
+  catch (err) {
+    console.error("Failed to fetch :", err);
+  }
+
+});
+
+app.get("/getFavorites", isLoggedIn, async (req, res) => {
+  const user = req.user;
+  const favorites = await FavoritesModel.find({ userId: user._id }).lean();
+  res.json(favorites);
+})
+
+//adding and deleting favorites
+
+app.post("/favorites", isLoggedIn, async (req, res) => {
+  const symbol = req.body.symbol;
+  const user = req.user;
+
+  try {
+    const existing = await FavoritesModel.findOne({ userId: user._id, Symbol: symbol });
+
+    if (existing) {
+      //remove it
+      await FavoritesModel.deleteOne({ _id: existing._id, Symbol: symbol });
+      res.json({ isFav: false })
+
+    }
+    else {
+      // add it 
+      await FavoritesModel.create({ userId: user._id, Symbol: symbol });
+      res.json({ isFav: true });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+})
+
+//fetching stocks
+app.post("/stocks",isLoggedIn, async (req, res) => {
+  const user = req.user;
+  console.log(user);
+  const symbols = await FavoritesModel.find({userId: user._id})
+ const symbolsArray = symbols.map(f => f.Symbol);
+ console.log(symbolsArray);
+  const results = await getQuote(symbolsArray);
   res.json(results);
 })
 

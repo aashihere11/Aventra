@@ -1,22 +1,34 @@
 import React, { useState, useContext, useEffect } from "react";
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import Tooltip from '@mui/material/Tooltip';
-import Fade from '@mui/material/Fade';
-import GeneralContext from "./GeneralContext";
 import { DoughnutChart } from "./DoughnutChart";
 import axios from "axios";
+import WatchListItem from "./WatchListItem";
+
 
 const WatchList = () => {
     const [watchlist, setWatchlist] = useState([]);
     const [search, setSearch] = useState("");
+    const [favSymbols, setFavSymbols] = useState([]);
+
+    useEffect(() => {
+        const fetchFav = async() =>{
+        try{
+        const response = await axios.post("http://localhost:3000/stocks", {},{ withCredentials: true })
+        console.log(response.data);
+        setFavSymbols(response.data.map(f => f.Symbol));
+            // Set watchlist to show favorite stocks
+            setWatchlist(response.data); 
+        }catch(error){
+            console.log(error);
+        } }
+         fetchFav();
+    }, []);
+   
 
     const handleSearch = async () => {
         console.log(search);
         try {
-            const response = await axios.get("http://localhost:3000/search", {params: { q: search }})
+            const response = await axios.get("http://localhost:3000/search",
+                { params: { q: search }, withCredentials: true })
             setWatchlist(response.data);
             console.log(response.data);
         }
@@ -24,7 +36,8 @@ const WatchList = () => {
             console.log("Error fetching stock data", error);
         }
     };
-    
+
+
     const data = {
         labels: watchlist.map((stock) => stock.symbol),
         datasets: [
@@ -70,7 +83,11 @@ const WatchList = () => {
             </div>
 
             <ul className="list"> {watchlist.map((stock, index) => {
-                return <WatchListItem stock={stock} key={index} />;
+                return <WatchListItem
+                    stock={stock} key={index}
+                    isFav={favSymbols.includes(stock.symbol)}
+                    onFavChange={setFavSymbols}
+                    favSymbols={favSymbols} />;
             })}</ul>
             <DoughnutChart data={data} />
         </div>
@@ -79,82 +96,3 @@ const WatchList = () => {
 
 export default WatchList;
 
-const WatchListItem = ({ stock }) => {
-    const [showWatchlistActions, setShowWatchlistActions] = useState(false);
-
-    const handleMouseEnter = (e) => {
-        setShowWatchlistActions(true);
-    };
-
-    const handleMouseLeave = (e) => {
-        setShowWatchlistActions(false);
-    };
-
-    return (
-        <li onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-            <div className="item">
-                <p className={stock.price < stock.previousClose ? "down" : "up"}>{stock.symbol}</p>
-                <div className="itemInfo">
-                    <span className="percent">{stock.percentChange}</span>
-                    {stock.price < stock.previousClose ? (
-                        <KeyboardArrowDownIcon className="down" />
-                    ) : (
-                        <KeyboardArrowUpIcon className="up" />
-                    )}
-                    <span className="price">{stock.price}</span>
-                    <span> {stock.lastUpdated}</span>
-                </div>
-            </div>
-            {showWatchlistActions && <WatchListActions uid={stock.symbol} price={stock.price} pc={stock.previousClose} />}
-        </li>
-    );
-};
-
-
-const WatchListActions = ({ uid, price, pc }) => {
-
-    const generalContext = useContext(GeneralContext);
-
-    const handleBuyClick = () => {
-        generalContext.openBuyWindow(uid, price, pc);
-    }
-    return (
-        <span className="actions">
-            <span>
-                <Tooltip
-                    title="Buy (B)"
-                    placement="top"
-                    arrow
-                    TransitionComponent={Fade}
-                    onClick={handleBuyClick}
-                >
-                    <button className="buy">Buy</button>
-                </Tooltip>
-                <Tooltip
-                    title="Sell (S)"
-                    placement="top"
-                    arrow
-                    TransitionComponent={Fade}
-                    onClick={handleBuyClick}
-                >
-                    <button className="sell">Sell</button>
-                </Tooltip>
-                <Tooltip
-                    title="Analytics (A)"
-                    placement="top"
-                    arrow
-                    TransitionComponent={Fade}
-                >
-                    <button className="action">
-                        <BarChartIcon className="icon" />
-                    </button>
-                </Tooltip>
-                <Tooltip title="More" placement="top" arrow TransitionComponent={Fade}>
-                    <button className="action">
-                        <MoreHorizIcon className="icon" />
-                    </button>
-                </Tooltip>
-            </span>
-        </span>
-    )
-};
