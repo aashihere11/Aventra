@@ -8,29 +8,31 @@ const WatchList = () => {
     const [watchlist, setWatchlist] = useState([]);
     const [search, setSearch] = useState("");
     const [favSymbols, setFavSymbols] = useState([]);
-
+    const [displayList, setDisplayList] = useState([]);
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
-        const fetchFav = async() =>{
-        try{
-        const response = await axios.post("http://localhost:3000/stocks", {},{ withCredentials: true })
-        console.log(response.data);
-        setFavSymbols(response.data.map(f => f.Symbol));
-            // Set watchlist to show favorite stocks
-            setWatchlist(response.data); 
-        }catch(error){
-            console.log(error);
-        } }
-         fetchFav();
+        const fetchFav = async () => {
+            try {
+                const response = await axios.post("http://localhost:3000/stocks", {}, { withCredentials: true })
+                setFavSymbols(response.data.map(f => f.Symbol));
+                // Set watchlist to show favorite stocks
+                setWatchlist(response.data);
+                setDisplayList(response.data);
+                setLoading(false);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        fetchFav();
     }, []);
-   
+
 
     const handleSearch = async () => {
-        console.log(search);
+
         try {
             const response = await axios.get("http://localhost:3000/search",
                 { params: { q: search }, withCredentials: true })
             setWatchlist(response.data);
-            console.log(response.data);
         }
         catch (error) {
             console.log("Error fetching stock data", error);
@@ -74,21 +76,33 @@ const WatchList = () => {
                     id="search"
                     placeholder="Search eg:infy, bse, nifty fut weekly, gold mcx"
                     className="search"
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) => {
+                        const value = e.target.value
+                        setSearch(value)
+                        if (value.trim() === "") { setWatchlist(displayList) }
+                    }}
                     value={search}
                     onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
                 />
                 <button onClick={handleSearch}>search</button>
                 {/* <span className="counts">{watchlist.length} /50</span> */}
             </div>
+            {loading ? (
+                <>
+                    <div className="spinner-continer d-flex justify-content-center align-items-center" style={{ minHeight: "50vh" }}  >
+                        <div class="spinner-border text-info-emphasis" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div /></div></>) :
 
-            <ul className="list"> {watchlist.map((stock, index) => {
-                return <WatchListItem
-                    stock={stock} key={index}
-                    isFav={favSymbols.includes(stock.symbol)}
-                    onFavChange={setFavSymbols}
-                    favSymbols={favSymbols} />;
-            })}</ul>
+                (
+                    <ul className="list"> {watchlist.map((stock, index) => {
+                        return <WatchListItem
+                            stock={stock} key={index} 
+                            isFav={favSymbols.includes(stock.Symbol)}
+                            onFavChange={setFavSymbols}
+                            favSymbols={favSymbols} />;
+                    })}</ul>)}
             <DoughnutChart data={data} />
         </div>
     );

@@ -1,30 +1,51 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import GeneralContext from "./GeneralContext";
 import axios from "axios";
 import "../BuyActionWindow.css";
 
-const BuyActionWindow = ({ uid, price, pc }) => {
-
+const BuyActionWindow = ({ uid, price, pc, type }) => {
     const generalContext = useContext(GeneralContext);
-    const [stockQuantity, setStockQuantity] = useState(1);
+    const [inputQuantity, setInputQuantity] = useState(1);
     const [product, setProduct] = useState("CNC");
-    const totalprice = stockQuantity * price.toFixed(2);
+    const [availableQty, setAvailableQty] = useState(0);
+    const totalprice = inputQuantity *Number(price);
+
+    useEffect(() => {
+        if (type !== "SELL") return;
+
+        async function fetchData(params) {
+
+            try {
+
+                if (product == "CNC") {
+                    const res = await axios.get(`http://localhost:3000/holdings/${uid}/${product}`, { withCredentials: true });
+                    setAvailableQty(res.data.qty || 0);
+                   
+                } else {
+                    const res = await axios.get(`http://localhost:3000/positions/${uid}/${product}`, { withCredentials: true });
+                    setAvailableQty(res.data.qty || 0);
+                }
+
+            } catch (err) { console.log(err) }
+
+        }
+        fetchData();
+    }, [product, type, uid])
 
 
     const handleBuyClick = async () => {
         generalContext.closeBuyWindow();
         try {
-            await axios.post("http://localhost:3000/newOrder", {
+            await axios.post("http://localhost:3000/Order", {
                 product: product,
                 name: uid,
-                qty: stockQuantity,
+                qty: inputQuantity,
                 price: totalprice,
                 pc: pc,
-                mode: "BUY",
+                mode: type,
 
             }, { withCredentials: true });
-
         }
         catch (err) {
             console.log(err, "something is wrong");
@@ -46,8 +67,10 @@ const BuyActionWindow = ({ uid, price, pc }) => {
                             type="number"
                             name="qty"
                             id="qty"
-                            onChange={(e) => setStockQuantity(Number(e.target.value))}
-                            value={stockQuantity}
+                            min={1}
+                            max={type === "SELL" ? availableQty : undefined}
+                            onChange={(e) => setInputQuantity(Number(e.target.value))}
+                            value={inputQuantity}
                         />
                     </fieldset>
                     <select name="product"
@@ -62,7 +85,8 @@ const BuyActionWindow = ({ uid, price, pc }) => {
                             type="number"
                             name="price"
                             id="price"
-                            value={parseFloat(price)}
+                        value={parseFloat(totalprice)}
+                        readOnly
                         />
                     </fieldset>
                 </div>
@@ -71,9 +95,12 @@ const BuyActionWindow = ({ uid, price, pc }) => {
             <div className="buttons">
                 <span>Margin required ₹140.65</span>
                 <div>
-                    <Link className="buy-btn btns" onClick={handleBuyClick} >
-                        Buy
-                    </Link>
+                    <button className="buy-btn btns"
+                        onClick={handleBuyClick}
+                        disabled={type === "SELL" && (inputQuantity <= 0 || inputQuantity > availableQty)}>
+                        {type == "BUY" ? "Buy" : "Sell"}
+                    </button>
+
                     <Link to="" className="cancel-btn btns" onClick={handleCancelClick}>
                         Cancel
                     </Link>

@@ -11,13 +11,15 @@ export const GeneralContextProvider = (props) => {
     const [isBuyWindowOpen, setIsBuyWindowOpen] = useState(false);
     const [selectedStockUID, setSelectedStockUID] = useState("");
     const [selectedStockPrice, setSelectedStockPrice] = useState("");
-    const [prevClose , setPrevClose] = useState("")
+    const [prevClose, setPrevClose] = useState("")
+    const [orderType, setOrderType] = useState("");
 
-    const handleOpenBuyWindow = (uid , price, pc) => {
+    const handleOpenBuyWindow = (uid, price, pc, type) => {
         setIsBuyWindowOpen(true);
         setSelectedStockUID(uid);
         setSelectedStockPrice(price);
         setPrevClose(pc);
+        setOrderType(type)
     };
 
     const handleCloseBuyWindow = () => {
@@ -33,7 +35,7 @@ export const GeneralContextProvider = (props) => {
             }}
         >
             {props.children}
-            {isBuyWindowOpen && <BuyActionWindow uid={selectedStockUID} price={selectedStockPrice} pc={prevClose} />}
+            {isBuyWindowOpen && <BuyActionWindow uid={selectedStockUID} price={selectedStockPrice} pc={prevClose} type={orderType} />}
         </GeneralContext.Provider>
     );
 };

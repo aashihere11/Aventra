@@ -10,6 +10,7 @@ import Fade from '@mui/material/Fade';
 import axios from "axios";
 
 const WatchListActions = ({ isFav, onFavChange, favSymbols, uid, price, pc }) => {
+    
 
     const addtoFavorites = async (e) => {
         try {
@@ -26,8 +27,8 @@ const WatchListActions = ({ isFav, onFavChange, favSymbols, uid, price, pc }) =>
 
     const generalContext = useContext(GeneralContext);
 
-    const handleBuyClick = () => {
-        generalContext.openBuyWindow(uid, price, pc);
+    const handleBuyClick = (type) => {
+        generalContext.openBuyWindow(uid, price, pc, type);
     }
     return (
         <span className="actions">
@@ -37,7 +38,7 @@ const WatchListActions = ({ isFav, onFavChange, favSymbols, uid, price, pc }) =>
                     placement="top"
                     arrow
                     TransitionComponent={Fade}
-                    onClick={handleBuyClick}
+                    onClick={()=>handleBuyClick("BUY")}
                 >
                     <button className="buy">Buy</button>
                 </Tooltip>
@@ -46,7 +47,7 @@ const WatchListActions = ({ isFav, onFavChange, favSymbols, uid, price, pc }) =>
                     placement="top"
                     arrow
                     TransitionComponent={Fade}
-                    onClick={handleBuyClick}
+                    onClick={()=>handleBuyClick("SELL")}
                 >
                     <button className="sell">Sell</button>
                 </Tooltip>

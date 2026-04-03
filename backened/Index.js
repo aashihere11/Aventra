@@ -65,7 +65,7 @@ async function getQuote(symbols) {
     }
 
   }
-console.log(results)
+  console.log(results)
   return results;
 }
 
@@ -79,7 +79,7 @@ app.get("/search", async (req, res) => {
     const { data } = await axios.get("https://finnhub.io/api/v1/search",
       { params: { q: query, token: process.env.FINNHUB_API_KEY } });
 
-   const filteredResults = data.result.slice(0, 5).map(stock => stock.symbol);
+    const filteredResults = data.result.slice(0, 5).map(stock => stock.symbol);
 
     const results = await getQuote(filteredResults);
     res.json(results);
@@ -118,12 +118,12 @@ app.post("/favorites", isLoggedIn, async (req, res) => {
 })
 
 //fetching stocks
-app.post("/stocks",isLoggedIn, async (req, res) => {
+app.post("/stocks", isLoggedIn, async (req, res) => {
   const user = req.user;
   console.log(user);
-  const symbols = await FavoritesModel.find({userId: user._id})
- const symbolsArray = symbols.map(f => f.Symbol);
- console.log(symbolsArray);
+  const symbols = await FavoritesModel.find({ userId: user._id })
+  const symbolsArray = symbols.map(f => f.Symbol);
+  console.log(symbolsArray);
   const results = await getQuote(symbolsArray);
   res.json(results);
 })
@@ -155,10 +155,9 @@ app.get("/allOrders", isLoggedIn, async (req, res) => {
   let allOrders = await OrdersModel.find({ userId: user._id });
   res.json(allOrders);
 });
-
+// updating holdings
 async function updateHoldings(user, { name, qty, price, mode, pc }) {
-
-
+  console.log("req aayi");
   const holding = await HoldingsModel.findOne({ userId: user._id, name: name });
   if (mode === "BUY") {
 
@@ -184,10 +183,30 @@ async function updateHoldings(user, { name, qty, price, mode, pc }) {
       { upsert: true }
     );
 
+  } else {
+    const totalqty = holding.qty - qty;
+    const totalprice = holding.price - price;
+    const avgPrice = holding.avg;
+    const curValue = totalqty * totalprice;
+    const investment = totalqty * avgPrice;
 
+    await HoldingsModel.updateOne(
+      { userId: user._id, name: name },
+
+      {
+        $set: {
+          qty: totalqty,
+          avg: avgPrice,
+          price: totalprice,
+          net: curValue - investment,
+          day: curValue - (pc * qty)
+        }
+      },
+    );
   }
-}
 
+}
+//updating positions
 async function updatePosition(user, { name, qty, price, mode, product }) {
   try {
     const position = await PositionsModel.findOne({ userId: user._id, name, product });
@@ -221,28 +240,28 @@ async function updatePosition(user, { name, qty, price, mode, product }) {
   }
 }
 // create new order
-app.post("/newOrder", isLoggedIn, async (req, res) => {
+app.post("/Order", isLoggedIn, async (req, res) => {
   const { name, qty, price, mode, pc, product } = req.body;
-
   const user = req.user;
-
   try {
-    let newOrder = new OrdersModel({
-      userId: user._id,
-      name: name,
-      qty: qty,
-      price: price,
-      mode: mode,
-    });
+   
+      let newOrder = new OrdersModel({
+        userId: user._id,
+        name: name,
+        qty: qty,
+        price: price,
+        mode: mode,
+      });
 
-    await newOrder.save();
-
+      await newOrder.save();
+    
     // update positions
 
     await updatePosition(user, { name, qty, price, mode, product });
 
     //Update Holdings accordingly
-    if (product == "CNS") {
+    console.log(product);
+    if (product === "CNC") {
       await updateHoldings(user, { name, qty, price, mode, pc });
     }
   }
@@ -252,11 +271,10 @@ app.post("/newOrder", isLoggedIn, async (req, res) => {
 });
 
 app.get("/me", isLoggedIn, (req, res) => {
-
   const user = req.user;
-
   res.json({ user });
 });
+
 
 //user registration
 app.post("/create", async (req, res) => {
@@ -299,7 +317,7 @@ app.post("/create", async (req, res) => {
   });
 });
 
-
+// login user
 
 app.post('/login', async (req, res) => {
   const user = await UsersModel.findOne({ username: req.body.username });
@@ -330,6 +348,8 @@ app.post('/login', async (req, res) => {
 
 });
 
+// logout user
+
 app.post("/logout", (req, res) => {
   try {
     res.clearCookie("token", {
@@ -345,6 +365,39 @@ app.post("/logout", (req, res) => {
     return res.status(500).json({ success: false });
   }
 })
+// get holding
+app.get("/holdings/:symbol/:product", isLoggedIn, async (req, res) => {
+  const { symbol, product } = req.params;
+  const user = req.user;
+  try {
+    const holding = await HoldingsModel.findOne({
+      userId: user._id,
+      name: symbol
+    });
+    res.json({ qty: holding ? holding.qty : 0 });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "something went wrong" });
+  }
+});
+
+//  get position 
+
+app.get("/positions/:symbol/:product", isLoggedIn, async (req, res) => {
+  const { symbol, product } = req.params;
+  const user = req.user;
+  try {
+    const position = await PositionsModel.findOne({
+      userId: user._id,
+      name: symbol,
+      product: product
+    });
+    res.json({ qty: position ? position.qty : 0 });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "something went wrong" });
+  }
+});
 
 
 app.get("/", (req, res) => {
