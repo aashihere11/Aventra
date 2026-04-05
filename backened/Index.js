@@ -8,6 +8,8 @@ const { PositionsModel } = require("./Models/PositionsModel");
 const { OrdersModel } = require("./Models/OrdersModel");
 const { UsersModel } = require("./Models/UsersModel")
 const { FavoritesModel } = require("./Models/FavoritesModel");
+const { TransactionModel } = require("./Models/TransactionsModel");
+const { WalletModel } = require("./Models/WalletsModel");
 const cors = require('cors');
 const finnhub = require('finnhub');
 const session = require('express-session');
@@ -283,7 +285,9 @@ app.get("/me", isLoggedIn, (req, res) => {
   res.json({ user });
 });
 
+async function createWallet(){
 
+}
 //user registration
 app.post("/create", async (req, res) => {
   const { username, password, email } = req.body;
@@ -311,6 +315,7 @@ app.post("/create", async (req, res) => {
         email,
         password: hash
       })
+        await WalletModel.create({userId: User._id, balance: 0});
 
       const token = jwt.sign({ email, username }, process.env.JWT_SECRET);
       res.cookie("token", token, {
@@ -320,6 +325,7 @@ app.post("/create", async (req, res) => {
         path: "/",
         maxAge: 604800000
       });
+      
       res.status(201).json({ success: true, message: "User created successfully" });
     });
   });
@@ -431,9 +437,9 @@ app.post("/create-order", async (req, res) => {
 
 });
 
-app.post("/verify-payment", (req, res) =>{
+app.post("/verify-payment", isLoggedIn, async(req, res) =>{
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-
+const user = req.user;
   // 1. Signature banao
   const body = razorpay_order_id + "|" + razorpay_payment_id;
 
