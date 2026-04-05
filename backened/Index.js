@@ -17,7 +17,10 @@ const bcrypt = require('bcrypt');
 const app = express();
 const isLoggedIn = require('./middleware/auth.js');
 const axios = require('axios');
+const Razorpay = require('razorpay');
+const crypto = require("crypto");  
 app.use(cookieParser());
+
 
 
 const PORT = process.env.PORT || 3000;
@@ -31,6 +34,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const finnhubClient = new finnhub.DefaultApi(process.env.FINNHUB_API_KEY)
 
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 async function getQuote(symbols) {
   const results = [];
@@ -244,17 +252,17 @@ app.post("/Order", isLoggedIn, async (req, res) => {
   const { name, qty, price, mode, pc, product } = req.body;
   const user = req.user;
   try {
-   
-      let newOrder = new OrdersModel({
-        userId: user._id,
-        name: name,
-        qty: qty,
-        price: price,
-        mode: mode,
-      });
 
-      await newOrder.save();
-    
+    let newOrder = new OrdersModel({
+      userId: user._id,
+      name: name,
+      qty: qty,
+      price: price,
+      mode: mode,
+    });
+
+    await newOrder.save();
+
     // update positions
 
     await updatePosition(user, { name, qty, price, mode, product });
@@ -399,6 +407,48 @@ app.get("/positions/:symbol/:product", isLoggedIn, async (req, res) => {
   }
 });
 
+
+app.post("/create-order", async (req, res) => {
+  const { amount } = req.body; 
+  const options = {
+    amount: amount*100,
+    currency: "INR",
+    receipt: "receipt_" + Date.now()
+  }
+
+  try {
+    const order = await razorpay.orders.create(options);
+    res.json({
+      orderId: order.id,       
+      amount: order.amount,
+      currency: order.currency,
+      keyId: process.env.RAZORPAY_KEY_ID
+    });
+     console.log("Order created:", order);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+
+});
+
+app.post("/verify-payment", (req, res) =>{
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+  // 1. Signature banao
+  const body = razorpay_order_id + "|" + razorpay_payment_id;
+
+  const expectedSignature = crypto
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+    .update(body)
+    .digest("hex");
+
+  // 2. Compare karo
+  if (expectedSignature === razorpay_signature) {
+    res.json({ success: true, message: "Payment Verified ✅" });
+  } else {
+    res.status(400).json({ success: false, message: "Invalid Payment ❌" });
+  }
+})
 
 app.get("/", (req, res) => {
   res.send("connected")

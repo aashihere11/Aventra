@@ -1,14 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Funds = () => {
+    const [amount, setAmount] = useState();
+    const handlePayment = async () => {
+        const { data: order } = await axios.post("http://localhost:3000/create-order", { amount })
+
+        const options = {
+            key: order.keyId,
+            amount: order.amount,
+            currency: order.currency,
+            name: "Trading App",
+            description: "Add Funds",
+            order_id: order.orderId,
+
+            handler: (response) => {
+                axios.post("http://localhost:3000/verify-payment", {
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature,
+                })
+            }
+        }
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+    }
     return (
         <>
-            <div className="funds">
-                <p>Instant, zero-cost fund transfers with UPI </p>
-                <Link className="btn btn-green">Add funds</Link>
+
+            <div className="funds ">
+                {/* <p>Instant, zero-cost fund transfers with UPI </p> */}
+                <div className=" mt-3"><input
+                    type="number"
+                    placeholder="Enter amount"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    style={{ width: "70%", padding: 5 }}
+                /></div>
+                <Link className="btn btn-green" onClick={handlePayment}>Add funds</Link>
                 <Link className="btn btn-blue">Withdraw</Link>
             </div>
+
 
             <div className="row">
                 <div className="col">
@@ -74,12 +107,7 @@ const Funds = () => {
                     </div>
                 </div>
 
-                <div className="col">
-                    <div className="commodity">
-                        <p>You don't have a commodity account</p>
-                        <Link className="btn btn-blue">Open Account</Link>
-                    </div>
-                </div>
+              
             </div>
         </>
     );

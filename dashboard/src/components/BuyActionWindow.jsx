@@ -9,7 +9,7 @@ const BuyActionWindow = ({ uid, price, pc, type }) => {
     const [inputQuantity, setInputQuantity] = useState(1);
     const [product, setProduct] = useState("CNC");
     const [availableQty, setAvailableQty] = useState(0);
-    const totalprice = inputQuantity *Number(price);
+    const totalprice = inputQuantity * Number(price);
 
     useEffect(() => {
         if (type !== "SELL") return;
@@ -21,7 +21,7 @@ const BuyActionWindow = ({ uid, price, pc, type }) => {
                 if (product == "CNC") {
                     const res = await axios.get(`http://localhost:3000/holdings/${uid}/${product}`, { withCredentials: true });
                     setAvailableQty(res.data.qty || 0);
-                   
+
                 } else {
                     const res = await axios.get(`http://localhost:3000/positions/${uid}/${product}`, { withCredentials: true });
                     setAvailableQty(res.data.qty || 0);
@@ -85,8 +85,8 @@ const BuyActionWindow = ({ uid, price, pc, type }) => {
                             type="number"
                             name="price"
                             id="price"
-                        value={parseFloat(totalprice)}
-                        readOnly
+                            value={parseFloat(totalprice)}
+                            readOnly
                         />
                     </fieldset>
                 </div>
@@ -100,6 +100,9 @@ const BuyActionWindow = ({ uid, price, pc, type }) => {
                         disabled={type === "SELL" && (inputQuantity <= 0 || inputQuantity > availableQty)}>
                         {type == "BUY" ? "Buy" : "Sell"}
                     </button>
+                    {type === "SELL" && (inputQuantity <= 0 || inputQuantity > availableQty) && <p style={{ color: "red", fontSize: "12px" }}>
+                        not enough holdings
+                    </p>}
 
                     <Link to="" className="cancel-btn btns" onClick={handleCancelClick}>
                         Cancel
