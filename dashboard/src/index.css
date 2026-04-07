@@ -50,14 +50,18 @@ code {
   margin-right: 2px;
   margin-left: 2px;
 }
-
-.btn-green {
-  background: #4caf50;
+ .pay-btn{
+   text-decoration: none;
+   border-radius: 20px;
+   color:  #001f4d;
+  margin-top: -1%;
+  
+ }
+ .pay-btn:hover {
+  background:#001f4d;
+   color: #ffffff;
 }
 
-.btn-blue {
-  background: #4184f3;
-}
 
 .row {
   width: 100%;

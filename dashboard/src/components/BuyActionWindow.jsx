@@ -19,11 +19,11 @@ const BuyActionWindow = ({ uid, price, pc, type }) => {
             try {
 
                 if (product == "CNC") {
-                    const res = await axios.get(`http://localhost:3000/holdings/${uid}/${product}`, { withCredentials: true });
+                    const res = await axios.get(`http://localhost:3000/holding/${uid}/${product}`, { withCredentials: true });
                     setAvailableQty(res.data.qty || 0);
 
                 } else {
-                    const res = await axios.get(`http://localhost:3000/positions/${uid}/${product}`, { withCredentials: true });
+                    const res = await axios.get(`http://localhost:3000/position/${uid}/${product}`, { withCredentials: true });
                     setAvailableQty(res.data.qty || 0);
                 }
 
@@ -37,7 +37,7 @@ const BuyActionWindow = ({ uid, price, pc, type }) => {
     const handleBuyClick = async () => {
         generalContext.closeBuyWindow();
         try {
-            await axios.post("http://localhost:3000/Order", {
+            await axios.post("http://localhost:3000/order/Order", {
                 product: product,
                 name: uid,
                 qty: inputQuantity,

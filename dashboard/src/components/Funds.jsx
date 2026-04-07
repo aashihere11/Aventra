@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 
 const Funds = () => {
     const [amount, setAmount] = useState();
     const handlePayment = async () => {
-        const { data: order } = await axios.post("http://localhost:3000/create-order", { amount })
+        const { data: order } = await axios.post("http://localhost:3000/payment/create-order", { amount })
 
         const options = {
             key: order.keyId,
@@ -16,7 +17,7 @@ const Funds = () => {
             order_id: order.orderId,
 
             handler: (response) => {
-                axios.post("http://localhost:3000/verify-payment", {
+                axios.post("http://localhost:3000/payment/verify-payment", {
                     razorpay_order_id: response.razorpay_order_id,
                     razorpay_payment_id: response.razorpay_payment_id,
                     razorpay_signature: response.razorpay_signature,
@@ -29,85 +30,54 @@ const Funds = () => {
     return (
         <>
 
-            <div className="funds ">
-                {/* <p>Instant, zero-cost fund transfers with UPI </p> */}
-                <div className=" mt-3"><input
-                    type="number"
-                    placeholder="Enter amount"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    style={{ width: "70%", padding: 5 }}
-                /></div>
-                <Link className="btn btn-green" onClick={handlePayment}>Add funds</Link>
-                <Link className="btn btn-blue">Withdraw</Link>
-            </div>
 
 
-            <div className="row">
-                <div className="col">
-                    <span>
-                        <p>Equity</p>
-                    </span>
+            <div className="row ">
+                <div className="col d-flex justify-content-evenly">
+                    <div className=" ">
+                        <h5>Available Balance</h5>
+                        <p>jdnjfw</p></div>
+                    <div>
+                        <h5>Available Balance</h5>
+                        <p>jdnjfw</p></div>
+                    <div>
+                        <h5>Available Balance</h5>
+                        <p>jdnjfw</p></div>
+                </div>
 
-                    <div className="table">
-                        <div className="data">
-                            <p>Available margin</p>
-                            <p className="imp colored">4,043.10</p>
+                <div className="border ">
+                    <p>ADD FUNDS</p>
+                    <div className="d-flex mt-2 mb-2">
+                        <input type="text"
+                            min={100}
+                            placeholder="Enter Amount"
+                            className="form-control"
+                            onChange={(e) => setAmount(e.target.value)}
+                            value={amount}
+                            style={{ height: "50%" }} />
+                        <button className="pay-btn mx-2 fs-6" onClick={handlePayment}>Pay via Razorpay</button>
+                    </div>
+
+                </div>
+                <div className="txn-history border text-center mt-5">
+                    <p>TRANSACTION HISTORY</p>
+
+                    <div className=" txn-row d-flex border rounded mb-2">
+                        <div className="rounded-circle mt-2 mx-3 border text-center" style={{ width: "30px", height: "30px" }}>+</div>
+                        <div> </div>
+                        <p className=" mt-2 flex-grow-1">description</p>
+                        <p className=" mt-2 flex-grow-1">date</p>
+                        <div className="flex-grow-1"></div>
+                        <div><p className="mx-5 mt-2">amount</p></div>
+                        <div>
+
                         </div>
-                        <div className="data">
-                            <p>Used margin</p>
-                            <p className="imp">3,757.30</p>
-                        </div>
-                        <div className="data">
-                            <p>Available cash</p>
-                            <p className="imp">4,043.10</p>
-                        </div>
-                        <hr />
-                        <div className="data">
-                            <p>Opening Balance</p>
-                            <p>4,043.10</p>
-                        </div>
-                        <div className="data">
-                            <p>Opening Balance</p>
-                            <p>3736.40</p>
-                        </div>
-                        <div className="data">
-                            <p>Payin</p>
-                            <p>4064.00</p>
-                        </div>
-                        <div className="data">
-                            <p>SPAN</p>
-                            <p>0.00</p>
-                        </div>
-                        <div className="data">
-                            <p>Delivery margin</p>
-                            <p>0.00</p>
-                        </div>
-                        <div className="data">
-                            <p>Exposure</p>
-                            <p>0.00</p>
-                        </div>
-                        <div className="data">
-                            <p>Options premium</p>
-                            <p>0.00</p>
-                        </div>
-                        <hr />
-                        <div className="data">
-                            <p>Collateral (Liquid funds)</p>
-                            <p>0.00</p>
-                        </div>
-                        <div className="data">
-                            <p>Collateral (Equity)</p>
-                            <p>0.00</p>
-                        </div>
-                        <div className="data">
-                            <p>Total Collateral</p>
-                            <p>0.00</p>
-                        </div>
+
+
                     </div>
                 </div>
 
-              
+
             </div>
         </>
     );

@@ -23,7 +23,7 @@ const Menu = () => {
         e.preventDefault();
         
         try {
-            const response = await axios.post('http://localhost:3000/logout', {}, { withCredentials: true })
+            const response = await axios.post('http://localhost:3000/auth/logout', {}, { withCredentials: true })
             
             if (response?.data?.success) {
                 window.location.href = "http://localhost:5173/";

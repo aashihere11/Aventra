@@ -3,7 +3,7 @@ import  axios  from "axios";
 const Positions = () => {
     const [positions, setPositions] = useState([]);
     useEffect(() => {
-        axios.get("http://localhost:3000/allPositions")
+        axios.get("http://localhost:3000/position/allPositions")
             .then((response) => {
                 setPositions(response.data);
             })

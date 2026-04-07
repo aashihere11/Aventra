@@ -27,7 +27,7 @@ function Signup() {
         }
 
         try {
-            const response = await axios.post('http://localhost:3000/create', formData, { withCredentials: true });
+            const response = await axios.post('http://localhost:3000/auth/create', formData, { withCredentials: true });
             if (response.data.success) {
                   navigate('/');
             }
