@@ -1,8 +1,10 @@
 const router = require('express').Router();
 const isLoggedIn = require('../middleware/auth.js');
 require("dotenv").config();
+const { WalletModel } = require("../Models/WalletsModel");
 const Razorpay = require('razorpay');
 const crypto = require("crypto");  
+const {updateWallet} = require("./walletHelper");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -27,7 +29,6 @@ router.post("/create-order", async (req, res) => {
             currency: order.currency,
             keyId: process.env.RAZORPAY_KEY_ID
         });
-        console.log("Order created:", order);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -35,7 +36,7 @@ router.post("/create-order", async (req, res) => {
 });
  // verify-payment
 router.post("/verify-payment", isLoggedIn, async (req, res) => {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, amount } = req.body;
     const user = req.user;
     // 1. Signature banao
     const body = razorpay_order_id + "|" + razorpay_payment_id;
@@ -51,6 +52,13 @@ router.post("/verify-payment", isLoggedIn, async (req, res) => {
     } else {
         res.status(400).json({ success: false, message: "Invalid Payment ❌" });
     }
-});
+
+   //update wallet
+    const wallet = await WalletModel.findOneAndUpdate({userId:user._id}, {$inc:{balance:amount, totalAdded:amount}});
+    console.log(wallet);
+
+    // transaction
+     await updateWallet(user, "CREDIT", amount,  "Funds Added via Razorpay");
+}); 
 
 module.exports= router;

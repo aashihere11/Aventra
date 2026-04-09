@@ -3,12 +3,12 @@ dns.setServers(["1.1.1.1", "8.8.8.8"]);
 const express = require("express");
 const mongoose = require("mongoose");
 require("dotenv").config();
-const { TransactionModel } = require("./Models/TransactionsModel");
-const { WalletModel } = require("./Models/WalletsModel");
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const app = express();
 const isLoggedIn = require('./middleware/auth.js');
+const { WalletModel } = require('./Models/WalletsModel.js');
+
   
 app.use(cookieParser());
 
@@ -29,12 +29,20 @@ app.use('/order', require('./routes/orders'));
 app.use('/holding', require('./routes/holdings'));
 app.use('/position', require('./routes/positions'));
 app.use('/payment', require('./routes/payment'));
+app.use('/transaction', require('./routes/transaction'));
 
 
+app.get("/balance", isLoggedIn, async(req, res) => {
+  const user = req.user;
+  const wallet = await WalletModel.findOne({userId:user._id})
+  res.json({balance:wallet.balance});
+});
 app.get("/me", isLoggedIn, (req, res) => {
   const user = req.user;
   res.json({ user });
 });
+
+
 
 app.get("/", (req, res) => {
   res.send("connected")

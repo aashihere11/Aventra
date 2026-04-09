@@ -4,20 +4,25 @@ import GeneralContext from "./GeneralContext";
 import axios from "axios";
 import "../BuyActionWindow.css";
 
+
 const BuyActionWindow = ({ uid, price, pc, type }) => {
     const generalContext = useContext(GeneralContext);
     const [inputQuantity, setInputQuantity] = useState(1);
     const [product, setProduct] = useState("CNC");
     const [availableQty, setAvailableQty] = useState(0);
+    const [walletBalance, setWalletBalance] = useState();
     const totalprice = inputQuantity * Number(price);
 
     useEffect(() => {
+        if (type !== "BUY") return;
+        axios.get("http://localhost:3000/balance", { withCredentials: true })
+            .then(res => setWalletBalance(res.data.balance));
+    }, []);
+  
+    useEffect(() => {
         if (type !== "SELL") return;
-
         async function fetchData(params) {
-
             try {
-
                 if (product == "CNC") {
                     const res = await axios.get(`http://localhost:3000/holding/${uid}/${product}`, { withCredentials: true });
                     setAvailableQty(res.data.qty || 0);
@@ -28,13 +33,13 @@ const BuyActionWindow = ({ uid, price, pc, type }) => {
                 }
 
             } catch (err) { console.log(err) }
-
         }
         fetchData();
+
     }, [product, type, uid])
 
 
-    const handleBuyClick = async () => {
+    const handleClickAction = async () => {
         generalContext.closeBuyWindow();
         try {
             await axios.post("http://localhost:3000/order/Order", {
@@ -47,10 +52,7 @@ const BuyActionWindow = ({ uid, price, pc, type }) => {
 
             }, { withCredentials: true });
         }
-        catch (err) {
-            console.log(err, "something is wrong");
-        }
-
+        catch (error) { console.log(error) }
     };
 
     const handleCancelClick = () => {
@@ -95,14 +97,21 @@ const BuyActionWindow = ({ uid, price, pc, type }) => {
             <div className="buttons">
                 <span>Margin required ₹140.65</span>
                 <div>
+
                     <button className="buy-btn btns"
-                        onClick={handleBuyClick}
-                        disabled={type === "SELL" && (inputQuantity <= 0 || inputQuantity > availableQty)}>
+                        onClick={handleClickAction}
+                        disabled={type === "SELL" && (inputQuantity <= 0 || inputQuantity > availableQty) ||
+                            type === "BUY" && (totalprice > walletBalance)}>
                         {type == "BUY" ? "Buy" : "Sell"}
                     </button>
+
                     {type === "SELL" && (inputQuantity <= 0 || inputQuantity > availableQty) && <p style={{ color: "red", fontSize: "12px" }}>
                         not enough holdings
                     </p>}
+
+                    {type === "BUY" && totalprice > walletBalance && (
+                        <p style={{ color: "red", fontSize: "12px" }}>Insufficient balance!</p>
+                    )}
 
                     <Link to="" className="cancel-btn btns" onClick={handleCancelClick}>
                         Cancel

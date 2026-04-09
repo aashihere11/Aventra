@@ -2,13 +2,14 @@ const router = require('express').Router();
 const { HoldingsModel } = require("../Models/HoldingsModel.js");
 const { PositionsModel } = require("../Models/PositionsModel.js");
 const { OrdersModel } = require("../Models/OrdersModel.js");
+const { WalletModel } = require('../Models/WalletsModel.js');
+const { updateWallet } = require("./walletHelper");
 const isLoggedIn = require('../middleware/auth.js');
 
 
 
 // updating holdings
 async function updateHoldings(user, { name, qty, price, mode, pc }) {
-    console.log("req aayi");
     const holding = await HoldingsModel.findOne({ userId: user._id, name: name });
     if (mode === "BUY") {
 
@@ -33,8 +34,14 @@ async function updateHoldings(user, { name, qty, price, mode, pc }) {
             },
             { upsert: true }
         );
+        await updateWallet(user, "DEBIT", totalprice, `BUY${name} x${qty}`);
 
     } else {
+         if (holding.qty - qty == 0) {
+            await HoldingsModel.deleteOne({ userId: user._id, name: name });
+            await updateWallet(user, "CREDIT", price*qty, `SELL${name} x${qty}`);
+            return;
+        }
         const totalqty = holding.qty - qty;
         const totalprice = holding.price - price;
         const avgPrice = holding.avg;
@@ -54,6 +61,7 @@ async function updateHoldings(user, { name, qty, price, mode, pc }) {
                 }
             },
         );
+        await updateWallet(user, "CREDIT", totalprice, `SELL${name} x${qty}`);
     }
 }
 
@@ -80,6 +88,29 @@ async function updatePosition(user, { name, qty, price, mode, product }) {
                 },
                 { upsert: true }
             );
+
+        } else {
+            if (position.qty - qty == 0) {
+                await PositionsModel.deleteOne({ userId: user._id, name: name });
+                return;
+            }
+            const totalqty = position.qty - qty;
+            const totalprice = position.price - price;
+            const avgPrice = position.avg;
+
+            await PositionsModel.updateOne(
+                { userId: user._id, name: name },
+
+                {
+                    $set: {
+                        product: product,
+                        name: name,
+                        qty: totalqty,
+                        avg: avgPrice,
+                    }
+                },
+            );
+
         }
     }
     catch (error) {
@@ -96,6 +127,7 @@ router.get("/allOrders", isLoggedIn, async (req, res) => {
 router.post("/Order", isLoggedIn, async (req, res) => {
     const { name, qty, price, mode, pc, product } = req.body;
     const user = req.user;
+
     try {
 
         let newOrder = new OrdersModel({
@@ -120,6 +152,7 @@ router.post("/Order", isLoggedIn, async (req, res) => {
     }
     catch (err) {
         console.log(err);
-    }});
+    }
+});
 
-    module.exports = router;
+module.exports = router;

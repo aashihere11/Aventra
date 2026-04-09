@@ -27,7 +27,7 @@ const WatchListActions = ({ isFav, onFavChange, favSymbols, uid, price, pc }) =>
 
     const generalContext = useContext(GeneralContext);
 
-    const handleBuyClick = (type) => {
+    const handleClickAction = (type) => {
         generalContext.openBuyWindow(uid, price, pc, type);
     }
     return (
@@ -38,7 +38,7 @@ const WatchListActions = ({ isFav, onFavChange, favSymbols, uid, price, pc }) =>
                     placement="top"
                     arrow
                     TransitionComponent={Fade}
-                    onClick={()=>handleBuyClick("BUY")}
+                    onClick={()=>handleClickAction("BUY")}
                 >
                     <button className="buy">Buy</button>
                 </Tooltip>
@@ -47,7 +47,7 @@ const WatchListActions = ({ isFav, onFavChange, favSymbols, uid, price, pc }) =>
                     placement="top"
                     arrow
                     TransitionComponent={Fade}
-                    onClick={()=>handleBuyClick("SELL")}
+                    onClick={()=>handleClickAction("SELL")}
                 >
                     <button className="sell">Sell</button>
                 </Tooltip>
