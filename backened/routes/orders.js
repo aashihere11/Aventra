@@ -2,7 +2,6 @@ const router = require('express').Router();
 const { HoldingsModel } = require("../Models/HoldingsModel.js");
 const { PositionsModel } = require("../Models/PositionsModel.js");
 const { OrdersModel } = require("../Models/OrdersModel.js");
-const { WalletModel } = require('../Models/WalletsModel.js');
 const { updateWallet } = require("./walletHelper");
 const isLoggedIn = require('../middleware/auth.js');
 

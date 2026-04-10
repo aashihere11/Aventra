@@ -17,38 +17,38 @@ function Hero() {
             >
                 <div className="col-6 p-5">
                     <p>
-                        We kick-started operations on the 15th of August, 2010 with the goal
-                        of breaking all barriers that traders and investors face in India in
-                        terms of cost, support, and technology. We named the company
-                        Zerodha, a combination of Zero and "Rodha", the Sanskrit word for
-                        barrier.
+                        Aventra was built with a simple mission — to make stock market
+                        investing accessible to every Indian, regardless of their
+                        background or experience.
                     </p>
                     <p>
-                        Today, our disruptive pricing models and in-house technology have
-                        made us the biggest stock broker in India.
+                        We provide a clean, beginner-friendly platform where anyone can
+                        learn to trade, track their portfolio, and grow their wealth
+                        without the complexity of traditional brokers.
                     </p>
                     <p>
-                        Over 1+ Crore clients place millions of orders every day through our
-                        powerful ecosystem of investment platforms, contributing over 15% of
-                        all Indian retail trading volumes.
+                        Whether you are a first-time investor or an active trader,
+                        Aventra gives you the tools to make smarter financial decisions
+                        every day.
                     </p>
                 </div>
                 <div className="col-6 p-5">
                     <p>
-                        In addition, we run a number of popular open online educational and
-                        community initiatives to empower retail traders and investors.
+                        Our simulated trading environment lets beginners practice with
+                        virtual funds — so you can learn how real markets work before
+                        investing a single rupee.
                     </p>
                     <p>
                         <a href="" style={{ textDecoration: "none" }}>
                             Rainmatter
                         </a>
-                        , our fintech fund and incubator, has invested in several fintech
-                        startups with the goal of growing the Indian capital markets.
+                        We believe financial literacy is a right, not a privilege.
+                        That's why Aventra is designed to educate and empower —
+                        not just execute trades.
                     </p>
                     <p>
-                        And yet, we are always up to something new every day. Catch up on
-                        the latest updates on our blog or see what the media is saying about
-                        us.
+                        We are constantly improving. Follow our journey and be part of
+                        a growing community of smart, informed investors across India.
                     </p>
                 </div>
             </div>

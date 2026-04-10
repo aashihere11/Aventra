@@ -13,23 +13,25 @@ function Team() {
       >
         <div className="col-6 p-3 text-center">
           <img
-            src="media/images/nithinKamath.jpg"
-            style={{ borderRadius: "100%", width: "50%" }}
+            src="media/profile.jpeg"
+            style={{ borderRadius: "100%", width: "60%" ,}}
           />
           <h4 className="mt-5">Aashi Meena</h4>
           <h6>Founder, CEO</h6>
         </div>
         <div className="col-6 p-3">
           <p>
-            Nithin bootstrapped and founded  Aventra in 2010 to overcome the
-            hurdles he faced during his decade long stint as a trader. Today,
-            Aventrahas changed the landscape of the Indian broking industry.
+            Aashi founded Aventra with a vision to make stock market investing
+            simple and accessible for every beginner in India. Frustrated by
+            the complexity of existing platforms, she built Aventra to bridge
+            the gap between wanting to invest and actually knowing how.
           </p>
           <p>
-            He is a member of the SEBI Secondary Market Advisory Committee
-            (SMAC) and the Market Data Advisory Committee (MDAC).
+            Aventra's simulated trading platform empowers first-time investors
+            to practice, learn, and grow their confidence before putting real
+            money at stake.
           </p>
-          <p>Playing basketball is his zen.</p>
+
           <p>
             Connect on <a href="">Homepage</a> / <a href="">TradingQnA</a> /{" "}
             <a href="">Twitter</a>

@@ -39,8 +39,8 @@ function Navbar() {
                 <Link to="/"
                     class="navbar-brand" href="#">
                     <img
-                        src="media/logo.svg"
-                        style={{ width: "25%" }}
+                        src="media/logo1.png"
+                        style={{ width: "20%" }}
                         alt="Logo"
                     />
                 </Link >
@@ -89,14 +89,10 @@ function Navbar() {
 
                             <li class="nav-item">
                                 <Link to="/about" class="nav-link active" >
-                                    About
+                                    About <CrueltyFreeSharpIcon />
                                 </Link >
                             </li>
-                            <li class="nav-item">
-                                <Link to="/product" class="nav-link active" >
-                                    Product <CrueltyFreeSharpIcon />
-                                </Link >
-                            </li>
+                           
                             <li class="nav-item">
                                 <Link to="/pricing" class="nav-link active" >
                                     Pricing <AttachMoneySharpIcon />
