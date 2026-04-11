@@ -66,7 +66,7 @@ function Navbar() {
                                                 Logout<LogoutIcon /></a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="https://aventra-1-780v.onrender.com/dashboard" className="nav-link">
+                                            <a href="https://aventra-1-780v.onrender.com/" className="nav-link">
                                                 Dashboard<DashboardIcon /></a>
 
                                         </li>
