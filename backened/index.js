@@ -9,13 +9,16 @@ const app = express();
 const isLoggedIn = require('./middleware/auth.js');
 const { WalletModel } = require('./Models/WalletsModel.js');
 
-  
+
 app.use(cookieParser());
 
 const PORT = process.env.PORT || 3000;
 const mongoURL = process.env.MONGO_URL;
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5174'],
+  origin: ['http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost:5174',
+    'https://aventra-9a7b.onrender.com'],
   credentials: true
 }));
 
@@ -32,10 +35,10 @@ app.use('/payment', require('./routes/payment'));
 app.use('/transaction', require('./routes/transaction'));
 
 
-app.get("/balance", isLoggedIn, async(req, res) => {
+app.get("/balance", isLoggedIn, async (req, res) => {
   const user = req.user;
-  const wallet = await WalletModel.findOne({userId:user._id})
-  res.json({balance:wallet.balance});
+  const wallet = await WalletModel.findOne({ userId: user._id })
+  res.json({ balance: wallet.balance });
 });
 app.get("/me", isLoggedIn, (req, res) => {
   const user = req.user;

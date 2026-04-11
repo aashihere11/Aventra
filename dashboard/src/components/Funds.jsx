@@ -10,16 +10,16 @@ const Funds = () => {
       const [walletBalance, setWalletBalance] = useState();
 
     useEffect(() => {
-        axios.get("http://localhost:3000/transaction/transactions", { withCredentials: true })
+        axios.get("https://aventra-9a7b.onrender.com/transaction/transactions", { withCredentials: true })
             .then(response => { setTransaction(response.data) })
             .catch(error => console.log(error));
 
-        axios.get("http://localhost:3000/balance", { withCredentials: true })
+        axios.get("https://aventra-9a7b.onrender.com/balance", { withCredentials: true })
             .then(res => setWalletBalance(res.data.balance));
     }, []);
 
     const handlePayment = async () => {
-        const { data: order } = await axios.post("http://localhost:3000/payment/create-order", { amount })
+        const { data: order } = await axios.post("https://aventra-9a7b.onrender.com/payment/create-order", { amount })
 
         const options = {
             key: order.keyId,
@@ -30,7 +30,7 @@ const Funds = () => {
             order_id: order.orderId,
 
             handler: (response) => {
-                axios.post("http://localhost:3000/payment/verify-payment", {
+                axios.post("https://aventra-9a7b.onrender.com/payment/verify-payment", {
                     razorpay_order_id: response.razorpay_order_id,
                     razorpay_payment_id: response.razorpay_payment_id,
                     razorpay_signature: response.razorpay_signature,

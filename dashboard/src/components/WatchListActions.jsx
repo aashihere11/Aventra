@@ -14,7 +14,7 @@ const WatchListActions = ({ isFav, onFavChange, favSymbols, uid, price, pc }) =>
 
     const addtoFavorites = async (e) => {
         try {
-            const response = await axios.post("http://localhost:3000/stock/favorites",
+            const response = await axios.post("https://aventra-9a7b.onrender.com/stock/favorites",
                 { symbol: uid }, { withCredentials: true });
             isFav = response.data.isFav;
             response.data.isFav ? onFavChange([...favSymbols, uid]) : onFavChange(favSymbols.filter(f => f !== uid));

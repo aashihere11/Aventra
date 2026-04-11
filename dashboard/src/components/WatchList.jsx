@@ -14,7 +14,7 @@ const WatchList = () => {
     useEffect(() => {
         const fetchFav = async () => {
             try {
-                const response = await axios.post("http://localhost:3000/stock/stocks", {}, { withCredentials: true })
+                const response = await axios.post("https://aventra-9a7b.onrender.com/stock/stocks", {}, { withCredentials: true })
                 setFavSymbols(response.data.map(f => f.Symbol));
                 // Set watchlist to show favorite stocks
                 setWatchlist(response.data);
@@ -31,7 +31,7 @@ const WatchList = () => {
     const handleSearch = async () => {
 
         try {
-            const response = await axios.get("http://localhost:3000/stock/search",
+            const response = await axios.get("https://aventra-9a7b.onrender.com/stock/search",
                 { params: { q: search }, withCredentials: true })
             setWatchlist(response.data);
         }

@@ -13,7 +13,7 @@ const Menu = () => {
 
     useEffect(() => {
 
-        axios.get('http://localhost:3000/me', { withCredentials: true })
+        axios.get('https://aventra-9a7b.onrender.com/me', { withCredentials: true })
             .then(res => setUser(res.data.user.username))
             .catch(() => setUser(null))
 
@@ -23,7 +23,7 @@ const Menu = () => {
         e.preventDefault();
         
         try {
-            const response = await axios.post('http://localhost:3000/auth/logout', {}, { withCredentials: true })
+            const response = await axios.post('https://aventra-9a7b.onrender.com/auth/logout', {}, { withCredentials: true })
             
             if (response?.data?.success) {
                 window.location.href = "http://localhost:5173/";

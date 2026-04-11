@@ -15,7 +15,7 @@ const BuyActionWindow = ({ uid, price, pc, type }) => {
 
     useEffect(() => {
         if (type !== "BUY") return;
-        axios.get("http://localhost:3000/balance", { withCredentials: true })
+        axios.get("https://aventra-9a7b.onrender.com/balance", { withCredentials: true })
             .then(res => setWalletBalance(res.data.balance));
     }, []);
   
@@ -24,11 +24,11 @@ const BuyActionWindow = ({ uid, price, pc, type }) => {
         async function fetchData(params) {
             try {
                 if (product == "CNC") {
-                    const res = await axios.get(`http://localhost:3000/holding/${uid}/${product}`, { withCredentials: true });
+                    const res = await axios.get(`https://aventra-9a7b.onrender.com/holding/${uid}/${product}`, { withCredentials: true });
                     setAvailableQty(res.data.qty || 0);
 
                 } else {
-                    const res = await axios.get(`http://localhost:3000/position/${uid}/${product}`, { withCredentials: true });
+                    const res = await axios.get(`https://aventra-9a7b.onrender.com/position/${uid}/${product}`, { withCredentials: true });
                     setAvailableQty(res.data.qty || 0);
                 }
 
@@ -42,7 +42,7 @@ const BuyActionWindow = ({ uid, price, pc, type }) => {
     const handleClickAction = async () => {
         generalContext.closeBuyWindow();
         try {
-            await axios.post("http://localhost:3000/order/Order", {
+            await axios.post("https://aventra-9a7b.onrender.com/order/Order", {
                 product: product,
                 name: uid,
                 qty: inputQuantity,
