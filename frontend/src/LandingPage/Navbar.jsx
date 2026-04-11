@@ -18,10 +18,10 @@ function Navbar() {
         e.preventDefault();
 
         try {
-            const response = await axios.post('http://localhost:3000/auth/logout', {}, { withCredentials: true })
+            const response = await axios.post('https://aventra-9a7b.onrender.com/auth/logout', {}, { withCredentials: true })
 
             if (response?.data?.success) {
-                window.location.href = "http://localhost:5173/";
+                window.location.href = "https://aventra-9a7b.onrender.com/";
             }
         }
         catch (error) {
@@ -66,7 +66,7 @@ function Navbar() {
                                                 Logout<LogoutIcon /></a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="http://localhost:5174/dashboard" className="nav-link">
+                                            <a href="https://aventra-1-780v.onrender.com/dashboard" className="nav-link">
                                                 Dashboard<DashboardIcon /></a>
 
                                         </li>

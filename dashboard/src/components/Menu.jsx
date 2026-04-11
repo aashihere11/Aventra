@@ -26,7 +26,7 @@ const Menu = () => {
             const response = await axios.post('https://aventra-9a7b.onrender.com/auth/logout', {}, { withCredentials: true })
             
             if (response?.data?.success) {
-                window.location.href = "http://localhost:5173/";
+                window.location.href = "https://aventra-frontend.onrender.com/";
             }
         }
 
