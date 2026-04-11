@@ -36,8 +36,8 @@ router.post("/create", async (req, res) => {
       const token = jwt.sign({ email, username }, process.env.JWT_SECRET);
       res.cookie("token", token, {
         httpOnly: true,
-        secure: false,
-        sameSite: "lax",
+        secure: process.env.NODE_ENV ==="production",
+        sameSite: process.env.NODE_ENV ==="production" ? "none" :"lax",
         path: "/",
         maxAge: 604800000
       });
@@ -60,8 +60,8 @@ router.post('/login', async (req, res) => {
       const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET);
       res.cookie("token", token, {
         httpOnly: true,
-        secure: false,
-        sameSite: "lax",
+       secure: process.env.NODE_ENV ==="production",
+        sameSite: process.env.NODE_ENV ==="production" ? "none" :"lax",
         path: "/",
         maxAge: 604800000
       });
