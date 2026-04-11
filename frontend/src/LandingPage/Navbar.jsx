@@ -21,7 +21,7 @@ function Navbar() {
             const response = await axios.post('https://aventra-9a7b.onrender.com/auth/logout', {}, { withCredentials: true })
 
             if (response?.data?.success) {
-                window.location.href = "https://aventra-9a7b.onrender.com/";
+                window.location.href = "https://aventra-frontend.onrender.com/";
             }
         }
         catch (error) {
