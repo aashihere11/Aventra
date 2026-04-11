@@ -19,8 +19,8 @@ app.use(cors({
     'http://localhost:3000',
     'http://localhost:5174',
     'https://aventra-frontend.onrender.com',
-    'https://aventra-9a7b.onrender.com'],
-  credentials: true
+    'https://aventra-1-780v.onrender.com'],
+      credentials: true
 }));
 
 app.use(express.json());
